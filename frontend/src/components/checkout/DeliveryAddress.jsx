@@ -4,21 +4,21 @@ export default function DeliveryAddress() {
   return (
     <section className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-md">
       <div className="flex items-center justify-between mb-md">
-        <h2 className="font-h2 text-h2 text-on-surface">Delivery Address</h2>
+        <h2 className="font-h2 text-h2 text-on-surface">Адрес доставки</h2>
         <button className="font-label-md text-label-md text-primary-container hover:text-primary transition-colors flex items-center gap-xs">
           <span className="material-symbols-outlined text-[18px]">edit</span>
-          Edit
+          Изменить
         </button>
       </div>
       <div className="flex flex-col md:flex-row gap-md">
         <div className="flex-1 font-body-md text-body-md text-on-surface-variant">
-          <p className="font-label-md text-on-surface mb-xs">Home</p>
+          <p className="font-label-md text-on-surface mb-xs">Дом</p>
           <p>123 Culinary Boulevard, Apt 4B</p>
           <p>Gastronomy District</p>
           <p>New York, NY 10012</p>
           <p className="mt-sm flex items-center gap-xs text-tertiary">
             <span className="material-symbols-outlined text-[16px]">schedule</span>
-            Est. Delivery: 30-45 mins
+            Ожидаемая доставка: 30-45 мин
           </p>
         </div>
         <div className="w-full md:w-[200px] h-[120px] rounded-lg overflow-hidden border border-outline-variant/20 bg-surface-container-low flex items-center justify-center relative">

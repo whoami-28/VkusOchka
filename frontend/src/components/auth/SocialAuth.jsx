@@ -6,7 +6,7 @@ export default function SocialAuth() {
     <>
       <div className="relative flex items-center py-sm">
         <div className="flex-grow border-t border-outline-variant/50"></div>
-        <span className="flex-shrink-0 mx-sm font-label-sm text-label-sm text-outline">OR CONTINUE WITH</span>
+        <span className="flex-shrink-0 mx-sm font-label-sm text-label-sm text-outline">ИЛИ ВОЙТИ ЧЕРЕЗ</span>
         <div className="flex-grow border-t border-outline-variant/50"></div>
       </div>
       
@@ -14,7 +14,7 @@ export default function SocialAuth() {
         <Button variant="secondary" className="w-full flex items-center justify-center gap-sm">
           <img 
             src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYr2FWNXtuNkbvo-jjB0W0AJG_k-ftU2x-vRcxmvs8B7WHnlnIYpmoPXkJQo2DV2j4PoXUf3piuri5i3ALN2mBd6flBloLVmd-tEeRJAKJFQfJDc-QJ90PF0AxUQzVC_v0C9iQxYFY6NsCxsr15hMmMkza9Eo0pNjLvvRaHBS0B6h_6qMUgAYcpK0ZY7yCOpnbGdq8qCA-OXBiWivOeZc4z39fG7LwjVh4DqSSCV_SqRu3E9e6AkP735amFAaf3Hso9yRXpPLwV0Y" 
-            alt="Google Logo" 
+            alt="Google" 
             className="w-5 h-5" 
           />
           Google

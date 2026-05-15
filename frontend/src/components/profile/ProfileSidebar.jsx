@@ -14,31 +14,31 @@ export default function ProfileSidebar() {
           />
           <div>
             <h2 className="font-h2 text-on-surface text-lg">Julian Thorne</h2>
-            <p className="font-body-md text-sm text-tertiary">Premium Member</p>
+            <p className="font-body-md text-sm text-tertiary">Премиум аккаунт</p>
           </div>
         </div>
 
         <nav className="flex flex-col gap-2">
           <Link to="/profile/history" className="flex items-center gap-3 p-3 rounded-lg bg-primary-container/10 text-on-primary-container font-label-md">
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>receipt_long</span>
-            Order History
+            История заказов
           </Link>
           
           <Link to="/profile/cards" className="flex items-center gap-3 p-3 rounded-lg text-tertiary hover:bg-surface-container hover:text-on-surface transition-colors font-label-md">
             <span className="material-symbols-outlined">credit_card</span>
-            Linked Cards
+            Привязанные карты
           </Link>
           <Link to="/profile/addresses" className="flex items-center gap-3 p-3 rounded-lg text-tertiary hover:bg-surface-container hover:text-on-surface transition-colors font-label-md">
             <span className="material-symbols-outlined">location_on</span>
-            Saved Addresses
+            Мои адреса
           </Link>
           <Link to="/profile/favorites" className="flex items-center gap-3 p-3 rounded-lg text-tertiary hover:bg-surface-container hover:text-on-surface transition-colors font-label-md">
             <span className="material-symbols-outlined">favorite</span>
-            Favorite Carts
+            Избранное
           </Link>
           <Link to="/profile/settings" className="flex items-center gap-3 p-3 rounded-lg text-tertiary hover:bg-surface-container hover:text-on-surface transition-colors font-label-md">
             <span className="material-symbols-outlined">settings</span>
-            Settings
+            Настройки
           </Link>
         </nav>
       </div>

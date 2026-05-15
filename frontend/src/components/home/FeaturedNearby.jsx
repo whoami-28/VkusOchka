@@ -5,9 +5,9 @@ export default function FeaturedNearby() {
   return (
     <section className="flex flex-col gap-md">
       <div className="flex items-center justify-between">
-        <h2 className="font-h2 text-h2 text-on-surface">Featured Nearby</h2>
+        <h2 className="font-h2 text-h2 text-on-surface">Популярное рядом</h2>
         <Link to="/browse" className="font-label-md text-label-md text-primary-container hover:underline flex items-center gap-1">
-          View All <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+          Смотреть все <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
         </Link>
       </div>
 
@@ -22,16 +22,16 @@ export default function FeaturedNearby() {
           
           <div className="absolute bottom-0 left-0 w-full p-6 text-white">
             <div className="flex gap-2 mb-2">
-              <span className="bg-primary-container/90 backdrop-blur-sm text-white font-label-sm text-label-sm px-2 py-1 rounded">Promo</span>
+              <span className="bg-primary-container/90 backdrop-blur-sm text-white font-label-sm text-label-sm px-2 py-1 rounded">Акция</span>
               <span className="bg-surface/90 backdrop-blur-sm text-on-surface font-label-sm text-label-sm px-2 py-1 rounded flex items-center gap-1">
-                <span className="material-symbols-outlined text-[14px]">schedule</span> 20-30 min
+                <span className="material-symbols-outlined text-[14px]">schedule</span> 20-30 мин
               </span>
             </div>
             <h3 className="font-h2 text-h2 mb-1">Osteria Francescana</h3>
-            <p className="font-body-md text-body-md text-white/80 mb-2">Italian • Fine Dining • $$$</p>
+            <p className="font-body-md text-body-md text-white/80 mb-2">Итальянская • Ресторан • $$$</p>
             <div className="flex items-center gap-1 text-secondary-container">
               <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-              <span className="font-label-md text-label-md text-white">4.9 (500+ ratings)</span>
+              <span className="font-label-md text-label-md text-white">4.9 (500+ оценок)</span>
             </div>
           </div>
         </Link>
@@ -52,11 +52,11 @@ export default function FeaturedNearby() {
                   <span className="material-symbols-outlined text-[12px] text-primary-container" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
                 </div>
               </div>
-              <p className="font-body-md text-body-md text-on-surface-variant text-sm truncate">Japanese • Sushi • $$</p>
+              <p className="font-body-md text-body-md text-on-surface-variant text-sm truncate">Японская • Суши • $$</p>
             </div>
             <div className="flex items-center gap-3 text-on-surface-variant text-sm mt-2">
               <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">local_shipping</span> $1.99</span>
-              <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">schedule</span> 35-45 min</span>
+              <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">schedule</span> 35-45 мин</span>
             </div>
           </div>
         </Link>

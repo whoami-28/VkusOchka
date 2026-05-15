@@ -8,37 +8,37 @@ export default function OrderSummary({ subtotal, deliveryFee, serviceFee, total 
   return (
     <div className="w-full lg:w-[380px] shrink-0">
       <div className="bg-surface rounded-xl p-md border border-outline-variant/30 sticky top-[100px]">
-        <h2 className="font-h2 text-h2 text-on-surface mb-md">Order Summary</h2>
+        <h2 className="font-h2 text-h2 text-on-surface mb-md">Ваш заказ</h2>
         
         <div className="space-y-sm mb-lg">
           <div className="flex justify-between font-body-md text-body-md text-on-surface-variant">
-            <span>Subtotal</span>
+            <span>Сумма</span>
             <span>${subtotal}</span>
           </div>
           <div className="flex justify-between font-body-md text-body-md text-on-surface-variant">
-            <span>Delivery Fee</span>
+            <span>Доставка</span>
             <span>${deliveryFee}</span>
           </div>
           <div className="flex justify-between font-body-md text-body-md text-on-surface-variant">
-            <span>Service Fee</span>
+            <span>Сервисный сбор</span>
             <span>${serviceFee}</span>
           </div>
           
           <div className="pt-sm border-t border-outline-variant/30 mt-sm">
             <div className="flex justify-between font-h2 text-h2 text-on-surface">
-              <span>Total</span>
+              <span>Итого</span>
               <span className="text-primary">${total}</span>
             </div>
           </div>
         </div>
         
         <Button className="w-full py-[16px]" onClick={() => navigate('/checkout')}>
-          Proceed to Checkout
+          К оформлению
           <span className="material-symbols-outlined">arrow_forward</span>
         </Button>
         
         <p className="font-label-sm text-label-sm text-center text-on-surface-variant mt-sm opacity-70">
-          Taxes calculated at checkout
+          Налоги рассчитываются при оформлении
         </p>
       </div>
     </div>

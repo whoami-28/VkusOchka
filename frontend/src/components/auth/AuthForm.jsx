@@ -9,11 +9,11 @@ export default function AuthForm({ isLogin }) {
     <form className="flex flex-col gap-gutter">
       {!isLogin && (
         <div className="flex flex-col gap-xs">
-          <label htmlFor="name" className="font-label-sm text-label-sm text-on-surface-variant">Name</label>
+          <label htmlFor="name" className="font-label-sm text-label-sm text-on-surface-variant">Имя</label>
           <input 
             type="text" 
             id="name" 
-            placeholder="John Doe" 
+            placeholder="Иван Иванов" 
             className="w-full bg-surface-container-lowest border border-outline-variant rounded focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all py-sm px-gutter font-body-md text-body-md text-on-surface placeholder:text-outline-variant h-[48px]" 
           />
         </div>
@@ -31,10 +31,10 @@ export default function AuthForm({ isLogin }) {
 
       <div className="flex flex-col gap-xs">
         <div className="flex justify-between items-center">
-          <label htmlFor="password" className="font-label-sm text-label-sm text-on-surface-variant">Password</label>
+          <label htmlFor="password" className="font-label-sm text-label-sm text-on-surface-variant">Пароль</label>
           {isLogin && (
             <Link to="/forgot-password" className="font-label-sm text-label-sm text-primary-container hover:text-primary transition-colors">
-              Forgot Password?
+              Забыли пароль?
             </Link>
           )}
         </div>
@@ -58,7 +58,7 @@ export default function AuthForm({ isLogin }) {
       </div>
 
       <Button type="submit" className="w-full mt-sm">
-        {isLogin ? 'Login' : 'Sign Up'}
+        {isLogin ? 'Войти' : 'Зарегистрироваться'}
       </Button>
     </form>
   );

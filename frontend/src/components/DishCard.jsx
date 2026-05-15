@@ -19,7 +19,7 @@ export default function DishCard({ dish }) {
         <p className="font-body-md text-on-surface-variant line-clamp-2 mb-4 flex-grow">{dish.description}</p>
         
         <Button>
-          <span className="material-symbols-outlined">add</span> Add to Cart
+          <span className="material-symbols-outlined">add</span> В корзину
         </Button>
       </div>
     </div>

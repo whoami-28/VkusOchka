@@ -7,9 +7,9 @@ export default function ProductInfo({ product }) {
     <div className="flex flex-col h-full">
       <div className="flex-grow">
         <div className="flex items-center gap-xs text-tertiary font-label-md mb-sm">
-          <Link to="/" className="hover:text-primary">Home</Link>
+          <Link to="/" className="hover:text-primary">Главная</Link>
           <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-          <span className="text-on-surface">Signature</span>
+          <span className="text-on-surface">Боулы</span>
         </div>
 
         <h1 className="font-h1 text-on-surface mb-xs">{product.name}</h1>
@@ -18,37 +18,37 @@ export default function ProductInfo({ product }) {
           <span className="font-h2 text-primary-container">${product.price}</span>
           <div className="flex items-center gap-xs text-tertiary font-label-sm">
             <span className="material-symbols-outlined text-[16px] text-primary-container" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-            <span>{product.rating} ({product.reviews} reviews)</span>
+            <span>{product.rating} ({product.reviews} отзывов)</span>
           </div>
         </div>
 
         <p className="font-body-md text-on-surface-variant mb-lg">{product.description}</p>
 
         <div className="mb-lg border-t border-outline-variant pt-md">
-          <h3 className="font-label-md text-on-surface mb-sm">Choose Base</h3>
+          <h3 className="font-label-md text-on-surface mb-sm">Выберите основу</h3>
           <div className="flex flex-wrap gap-sm">
-            <button className="px-md py-sm rounded-lg border-2 border-primary-container bg-secondary-container/20 text-on-surface font-label-md">Quinoa</button>
-            <button className="px-md py-sm rounded-lg border border-outline-variant text-on-surface-variant font-label-md hover:bg-surface-container">Brown Rice</button>
-            <button className="px-md py-sm rounded-lg border border-outline-variant text-on-surface-variant font-label-md hover:bg-surface-container">Mixed Greens</button>
+            <button className="px-md py-sm rounded-lg border-2 border-primary-container bg-secondary-container/20 text-on-surface font-label-md">Киноа</button>
+            <button className="px-md py-sm rounded-lg border border-outline-variant text-on-surface-variant font-label-md hover:bg-surface-container">Бурый рис</button>
+            <button className="px-md py-sm rounded-lg border border-outline-variant text-on-surface-variant font-label-md hover:bg-surface-container">Микс салатов</button>
           </div>
         </div>
 
         <div className="mb-lg grid grid-cols-4 gap-sm bg-surface-container-low p-md rounded-xl border border-outline-variant/30">
           <div className="flex flex-col items-center">
             <span className="font-h2 text-on-surface">420</span>
-            <span className="font-label-sm text-tertiary">CAL</span>
+            <span className="font-label-sm text-tertiary">ККАЛ</span>
           </div>
           <div className="flex flex-col items-center border-l border-outline-variant/30">
             <span className="font-h2 text-on-surface">12g</span>
-            <span className="font-label-sm text-tertiary">PRO</span>
+            <span className="font-label-sm text-tertiary">БЕЛ</span>
           </div>
           <div className="flex flex-col items-center border-l border-outline-variant/30">
             <span className="font-h2 text-on-surface">48g</span>
-            <span className="font-label-sm text-tertiary">CARB</span>
+            <span className="font-label-sm text-tertiary">УГЛ</span>
           </div>
           <div className="flex flex-col items-center border-l border-outline-variant/30">
             <span className="font-h2 text-on-surface">18g</span>
-            <span className="font-label-sm text-tertiary">FAT</span>
+            <span className="font-label-sm text-tertiary">ЖИР</span>
           </div>
         </div>
       </div>
@@ -66,11 +66,11 @@ export default function ProductInfo({ product }) {
           </div>
           <Button className="flex-grow shadow-sm">
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>shopping_bag</span>
-            Add to Order - ${product.price}
+            Добавить к заказу - ${product.price}
           </Button>
         </div>
         <div className="text-center font-label-sm text-tertiary">
-          Estimated preparation time: 10-15 mins
+          Примерное время приготовления: 10-15 мин
         </div>
       </div>
     </div>

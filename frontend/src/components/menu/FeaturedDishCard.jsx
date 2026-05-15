@@ -7,7 +7,7 @@ export default function FeaturedDishCard({ dish }) {
       <div className="md:w-2/5 h-64 md:h-auto relative overflow-hidden">
         <img src={dish.image} alt={dish.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         <div className="absolute top-4 left-4 bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-sm text-label-sm shadow-sm">
-          Chef's Signature
+          От шеф-повара
         </div>
       </div>
       <div className="md:w-3/5 p-6 md:p-8 flex flex-col justify-center">
@@ -17,11 +17,11 @@ export default function FeaturedDishCard({ dish }) {
         </div>
         <p className="font-body-lg text-body-lg text-on-surface-variant mb-6">{dish.description}</p>
         <div className="flex flex-wrap gap-2 mb-6">
-          <span className="px-3 py-1 border border-outline text-on-surface font-label-sm text-label-sm rounded-full">Gluten-Free Option</span>
-          <span className="px-3 py-1 border border-outline text-on-surface font-label-sm text-label-sm rounded-full">High Protein</span>
+          <span className="px-3 py-1 border border-outline text-on-surface font-label-sm text-label-sm rounded-full">Без глютена</span>
+          <span className="px-3 py-1 border border-outline text-on-surface font-label-sm text-label-sm rounded-full">Много белка</span>
         </div>
         <Button className="w-full md:w-auto px-8 self-start">
-          <span className="material-symbols-outlined">add</span> Add to Cart
+          <span className="material-symbols-outlined">add</span> В корзину
         </Button>
       </div>
     </div>

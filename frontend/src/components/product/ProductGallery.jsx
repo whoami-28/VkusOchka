@@ -1,30 +1,43 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function ProductGallery({ mainImage, thumbnails }) {
+  const [activeImage, setActiveImage] = useState(mainImage);
+
+  useEffect(() => {
+    setActiveImage(mainImage);
+  }, [mainImage]);
+
   return (
-    <div className="flex flex-col gap-md">
-      <div className="rounded-xl overflow-hidden bg-surface-container-high aspect-square md:aspect-[4/3] w-full shadow-sm relative">
+    <div className="flex flex-col gap-4">
+      <div className="w-full h-[400px] md:h-[500px] rounded-2xl overflow-hidden bg-surface-container border border-outline-variant/30">
         <img 
-          src={mainImage} 
+          src={activeImage} 
           alt="Блюдо" 
-          className="w-full h-full object-cover" 
+          className="w-full h-full object-cover transition-opacity duration-300" 
         />
-        <div className="absolute top-md left-md flex gap-sm">
-          <span className="bg-surface/90 backdrop-blur-sm px-sm py-xs rounded-full text-primary font-label-sm border border-outline-variant">Веганское</span>
-          <span className="bg-surface/90 backdrop-blur-sm px-sm py-xs rounded-full text-primary font-label-sm border border-outline-variant">Без глютена</span>
-        </div>
       </div>
       
-      <div className="hidden md:flex gap-sm">
-        {thumbnails.map((thumb, idx) => (
-          <div 
-            key={idx} 
-            className={`w-24 h-24 rounded-lg overflow-hidden cursor-pointer transition-opacity ${idx === 0 ? 'border-2 border-primary' : 'border border-outline-variant opacity-70 hover:opacity-100'}`}
-          >
-            <img src={thumb} alt={`Миниатюра ${idx + 1}`} className="w-full h-full object-cover" />
-          </div>
-        ))}
-      </div>
+      {thumbnails && thumbnails.length > 0 && (
+        <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+          {thumbnails.map((thumb, idx) => (
+            <button
+              key={idx}
+              onClick={() => setActiveImage(thumb)}
+              className={`relative flex-shrink-0 w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden border-2 transition-all ${
+                activeImage === thumb 
+                  ? 'border-primary-container' 
+                  : 'border-transparent hover:border-outline-variant'
+              }`}
+            >
+              <img 
+                src={thumb} 
+                alt={`Миниатюра ${idx + 1}`} 
+                className="w-full h-full object-cover" 
+              />
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

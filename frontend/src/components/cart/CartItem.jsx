@@ -1,48 +1,52 @@
 import React from 'react';
+import { useCart } from '../../context/CartContext';
 
 export default function CartItem({ item }) {
+  const { updateQuantity, removeFromCart } = useCart();
+
+  const priceNum = Number(item.price) || 0;
+  const itemTotal = priceNum * item.quantity;
+
   return (
-    <div className="bg-surface rounded-xl p-md flex flex-col sm:flex-row gap-md border border-outline-variant/30">
-      <div className="w-full sm:w-[120px] h-[120px] rounded-lg overflow-hidden shrink-0">
+    <div className="flex flex-col sm:flex-row items-center gap-4 py-4 border-b border-outline-variant/30 last:border-0">
+      <div className="w-full sm:w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container border border-outline-variant/20">
         <img 
-          src={item.image} 
+          src={item.image || "https://lh3.googleusercontent.com/aida-public/AB6AXuDSLCgtR3sOKEvei80z9MMpJOPy6A8T0A6qB2HXoUKk5jdW_mIq3Q5Opa0GV6jMbcFRY5wnoOkTKU9Qk64gjNYBqvWyfc8hU6zJrjTrGvRdqt6-SFEr0OdfrEwEUfrP71V4YcJ5012tQ8GmNrj6n0dU5kKa-jf_QNRAUCJY4uOBqNipOf0tm9NEp9eSqWIaw3m50SLr7WoU3GZfGnRIj5UrcFwHNTfJ_kEUh3RoL8KHqjFrzPSDxKsmrj8AV_koJcOWN5T0bx9lv2g"} 
           alt={item.name} 
           className="w-full h-full object-cover" 
         />
       </div>
-      
-      <div className="flex-1 flex flex-col justify-between">
+      <div className="flex-grow w-full flex flex-col justify-between h-full">
         <div>
-          <div className="flex justify-between items-start mb-xs">
-            <h2 className="font-h2 text-h2 text-on-surface">{item.name}</h2>
-            <span className="font-label-md text-label-md text-primary">${item.price}</span>
-          </div>
-          <p className="font-body-md text-body-md text-on-surface-variant mb-sm">{item.category}</p>
-          {item.note && (
-            <p className="font-body-md text-body-md text-on-surface-variant text-sm italic mb-sm">{item.note}</p>
-          )}
-        </div>
-        
-        <div className="flex items-center justify-between mt-auto">
-          <div className="flex items-center gap-4 bg-surface-container rounded-full px-xs py-xs">
-            <button className="w-8 h-8 rounded-full flex items-center justify-center text-on-surface hover:bg-surface-variant transition-colors">
-              <span className="material-symbols-outlined text-[20px]">remove</span>
-            </button>
-            <span className="font-label-md text-label-md w-4 text-center">{item.quantity}</span>
-            <button className="w-8 h-8 rounded-full flex items-center justify-center text-on-surface hover:bg-surface-variant transition-colors">
-              <span className="material-symbols-outlined text-[20px]">add</span>
-            </button>
-          </div>
-          
-          <div className="flex gap-sm">
-            <button className="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md">
-              <span className="material-symbols-outlined text-[20px]">favorite</span>
-              <span className="hidden sm:inline">В избранное</span>
-            </button>
-            <button className="flex items-center gap-2 text-error hover:text-error-container transition-colors font-label-md text-label-md ml-4">
+          <div className="flex justify-between items-start mb-1">
+            <h3 className="font-h2 text-[18px] text-on-surface leading-tight">{item.name}</h3>
+            <button 
+              onClick={() => removeFromCart(item.id, item.note)} 
+              className="text-on-surface-variant hover:text-error transition-colors p-1"
+            >
               <span className="material-symbols-outlined text-[20px]">delete</span>
             </button>
           </div>
+          {item.note && <p className="font-label-sm text-tertiary mb-2">{item.note}</p>}
+        </div>
+        
+        <div className="flex justify-between items-center mt-auto">
+          <div className="flex items-center border border-outline-variant rounded-lg h-9 bg-surface">
+            <button 
+              onClick={() => updateQuantity(item.id, item.quantity - 1, item.note)} 
+              className="px-2 h-full flex items-center justify-center text-tertiary hover:text-primary transition-colors"
+            >
+              <span className="material-symbols-outlined text-[18px]">remove</span>
+            </button>
+            <span className="font-label-md text-on-surface w-8 text-center">{item.quantity}</span>
+            <button 
+              onClick={() => updateQuantity(item.id, item.quantity + 1, item.note)} 
+              className="px-2 h-full flex items-center justify-center text-tertiary hover:text-primary transition-colors"
+            >
+              <span className="material-symbols-outlined text-[18px]">add</span>
+            </button>
+          </div>
+          <span className="font-h2 text-[18px] text-primary-container">${itemTotal.toFixed(2)}</span>
         </div>
       </div>
     </div>

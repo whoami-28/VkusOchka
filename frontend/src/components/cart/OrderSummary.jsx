@@ -1,46 +1,46 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Button from '../../ui/Button';
+import { useCart } from '../../context/CartContext';
 
-export default function OrderSummary({ subtotal, deliveryFee, serviceFee, total }) {
-  const navigate = useNavigate();
+export default function OrderSummary() {
+  const { getCartTotal } = useCart();
+  
+  const subtotal = getCartTotal();
+  const deliveryFee = 2.99;
+  const serviceFee = 1.50;
+  const total = subtotal + deliveryFee + serviceFee;
 
   return (
-    <div className="w-full lg:w-[380px] shrink-0">
-      <div className="bg-surface rounded-xl p-md border border-outline-variant/30 sticky top-[100px]">
-        <h2 className="font-h2 text-h2 text-on-surface mb-md">Ваш заказ</h2>
-        
-        <div className="space-y-sm mb-lg">
-          <div className="flex justify-between font-body-md text-body-md text-on-surface-variant">
-            <span>Сумма</span>
-            <span>${subtotal}</span>
-          </div>
-          <div className="flex justify-between font-body-md text-body-md text-on-surface-variant">
-            <span>Доставка</span>
-            <span>${deliveryFee}</span>
-          </div>
-          <div className="flex justify-between font-body-md text-body-md text-on-surface-variant">
-            <span>Сервисный сбор</span>
-            <span>${serviceFee}</span>
-          </div>
-          
-          <div className="pt-sm border-t border-outline-variant/30 mt-sm">
-            <div className="flex justify-between font-h2 text-h2 text-on-surface">
-              <span>Итого</span>
-              <span className="text-primary">${total}</span>
-            </div>
-          </div>
+    <div className="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/30 sticky top-28">
+      <h2 className="font-h2 text-h2 text-on-surface mb-6">Ваш заказ</h2>
+      
+      <div className="flex flex-col gap-4 mb-6 border-b border-outline-variant/30 pb-6">
+        <div className="flex justify-between font-body-md text-on-surface-variant">
+          <span>Сумма заказа</span>
+          <span>${subtotal.toFixed(2)}</span>
         </div>
-        
-        <Button className="w-full py-[16px]" onClick={() => navigate('/checkout')}>
-          К оформлению
-          <span className="material-symbols-outlined">arrow_forward</span>
-        </Button>
-        
-        <p className="font-label-sm text-label-sm text-center text-on-surface-variant mt-sm opacity-70">
-          Налоги рассчитываются при оформлении
-        </p>
+        <div className="flex justify-between font-body-md text-on-surface-variant">
+          <span>Доставка</span>
+          <span>${deliveryFee.toFixed(2)}</span>
+        </div>
+        <div className="flex justify-between font-body-md text-on-surface-variant">
+          <span>Сервисный сбор</span>
+          <span>${serviceFee.toFixed(2)}</span>
+        </div>
       </div>
+      
+      <div className="flex justify-between items-center mb-8">
+        <span className="font-h1 text-[20px] text-on-surface">Итого</span>
+        <span className="font-h1 text-[24px] text-primary-container">${total.toFixed(2)}</span>
+      </div>
+      
+      <Link to="/checkout" className="block w-full">
+        <Button className="w-full py-3">
+          К оформлению
+          <span className="material-symbols-outlined ml-2">arrow_forward</span>
+        </Button>
+      </Link>
     </div>
   );
 }

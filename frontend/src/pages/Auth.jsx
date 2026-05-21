@@ -20,7 +20,7 @@ export default function Auth() {
         <div className="bg-surface/85 backdrop-blur-[12px] border border-outline-variant/20 w-full max-w-[480px] rounded-xl shadow-[0_8px_32px_rgba(40,40,39,0.08)] overflow-hidden flex flex-col">
           
           <div className="p-lg pb-md text-center">
-            <h1 className="font-h1 text-h1 text-on-surface mb-xs">CulinaryCurated</h1>
+            <h1 className="font-h1 text-h1 text-on-surface mb-xs">Vkusochka</h1>
             <p className="font-body-md text-body-md text-on-surface-variant">Ощутите вкус качества.</p>
           </div>
 

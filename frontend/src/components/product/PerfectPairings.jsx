@@ -1,39 +1,49 @@
 import React from 'react';
-
-const pairings = [
-  { id: 1, name: 'Холодный зеленый чай', desc: 'Свежезаваренный, без сахара', price: '3.50', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBitnhNFiUBMpvek6kRmiJ4BbFinChb1qM1P1tIqXMnzVALDXsZHjI4yvVSCiSVm6LYoYKJrbS-k1tw3BkNMDEpe8mfBTwHV0a5gT_sH4wdM9WuK6Str_QN2ZvYouU31GMcUFSkrrcVTq8y0BwcnHkIbfxtdnt_HmN4-TGnHPV8xLAjOGzd0N6PAlo5CI1QJYEg2d_B4DSgVhfkDe0tArMVLFK1xRQEei-6HmPe-Fem8l5G3XHxnys88R0osx0tGQIq3KRa5NrQfts' },
-  { id: 2, name: 'Пряный нут', desc: 'Хрустящий источник белка', price: '2.00', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBQgLtMs-AC0cK9zCIE7-N6GeGl0NLqE4Bjzj0sRVd8hoCPTk3AQDrhHNLZ4F6EuYUa33cn-uB2lbVzgw_fSxPIcpGXnC1uKZkbouHsgawqYDWeVl4XQzVdA3i2duFFUFvthYUtaC4AHbvC3fMjCQRQEqQpI6TWkGElbl43KdocFQV11j5GWK2zSCx4PhmVpOTfwj5x-t-Twe2rb6yyGFAj72-mQUNdkHRsqIEhiCnGY1qYo5TMGcg22rixdYzC690KWDsA4xTrcIM' },
-  { id: 3, name: 'Сок "Виталити"', desc: 'Морковь, яблоко, имбирь, куркума', price: '6.50', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAI0DLLA62sREfN5VQ5tZwwtx6w5j5N4DXelI8Xtgxi3c3vG4LFWJd1ONiPUWHZuwisyyO6H4Bn9m88qvISOxeIR_231AnPvNx1Gyyw1iLkFg7RvDZtzgsFPW53j3hCBNHKINrsELoB3_zAjrgCe5O6SjQqNeoRZgP3cR2qcPWbDm-41wc8kcffPoEMjomZGOQMUDA70ILh2JDDBqwmIeEIbhWltPnJFrZVS_BbjVntfNSzcM49qFpC8rbm8zEBi9Po95He8uXf2b0' }
-];
+import { useCart } from '../../context/CartContext';
 
 export default function PerfectPairings() {
+  const { addToCart } = useCart();
+
+  const pairings = [
+    {
+      id: 'pairing-1',
+      name: 'Матча Латте',
+      price: 4.50,
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD4lY5cAkL6e8o1DtqyErDzoVOAs122pbC0exAVLsXJokfr9stOfpphqoWPsr1iF31mveqY-K6wPV2mmMW7ae6G_IvpRiK8nqO1eEjIF8wQS7yXlmlrihF85004drkDUnO-XGcz5-9lOA0sSVEEeNP2hJaqDIuzSM71Yf8oxfsHFJ3t-6tf06sIejsDyp-XywZzFnc_KWj0xVEWz9oxNHSbuaWNgKEWztVYc8YRNqtUo_aZO1ywuEsYrx5CbVo9P0IyXH1ou2ePsmE'
+    },
+    {
+      id: 'pairing-2',
+      name: 'Сырный соус',
+      price: 1.00,
+      image: 'https://ferma-m2.ru/images/shop/recipe_image/crop_shutterstock_1009315681.jpg'
+    },
+    {
+      id: 'pairing-3',
+      name: 'Батат фри',
+      price: 5.50,
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCijleOSi3JlSa8tJFRUCAe9kpwyrhYRnNHTGrfLad8enJzCh59Ff6au-NaaZQGyKiWt5U22vhjsr24QmN_v8yqcfnESXr7MgtOYiyhI5-1RFxxQwaYOM2kMujo7f5Da8T5wHr1CyhLF48HY2vONnXR8olL9cqwiTRku94Azs3mo4Xtf5Q0mSuTH_OfxdGBVcgENwf8idTBxicmJZf4Wiah_KdS4fILFMTf5UM3NCIVzCKJxik7sOBCLBs5LLmTpvpjD2Fjx0PKDs8'
+    }
+  ];
+
   return (
-    <section className="max-w-7xl mx-auto w-full px-margin-mobile md:px-lg pb-xl">
-      <div className="flex items-center justify-between mb-md">
-        <h2 className="font-h2 text-on-surface">Идеальное сочетание</h2>
-        <div className="flex gap-sm">
-          <button className="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-tertiary hover:bg-surface-container transition-colors disabled:opacity-50">
-            <span className="material-symbols-outlined">arrow_back</span>
-          </button>
-          <button className="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-tertiary hover:bg-surface-container transition-colors">
-            <span className="material-symbols-outlined">arrow_forward</span>
-          </button>
-        </div>
-      </div>
-      <div className="flex gap-md overflow-x-auto pb-sm snap-x snap-mandatory scrollbar-hide">
+    <section className="mt-xl border-t border-outline-variant pt-lg">
+      <h2 className="font-h2 text-h2 text-on-surface mb-md">Идеально сочетается</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-md">
         {pairings.map(item => (
-          <div key={item.id} className="min-w-[240px] md:min-w-[280px] bg-surface-container-low rounded-xl border border-outline-variant/30 overflow-hidden snap-start flex flex-col cursor-pointer hover:shadow-sm transition-shadow">
-            <div className="h-40 bg-surface-container-high relative">
+          <div key={item.id} className="flex items-center gap-4 bg-surface-container-low p-4 rounded-xl border border-outline-variant/30">
+            <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
               <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-              <button className="absolute bottom-sm right-sm w-8 h-8 bg-surface rounded-full flex items-center justify-center shadow-sm text-primary hover:bg-surface-container">
-                <span className="material-symbols-outlined text-[18px]">add</span>
-              </button>
             </div>
-            <div className="p-sm flex flex-col flex-grow">
-              <span className="font-label-md text-on-surface mb-xs">{item.name}</span>
-              <span className="font-body-md text-on-surface-variant line-clamp-1 mb-sm flex-grow">{item.desc}</span>
-              <span className="font-label-md text-primary-container">+${item.price}</span>
+            <div className="flex-grow">
+              <h4 className="font-label-md text-on-surface mb-1">{item.name}</h4>
+              <span className="font-label-md text-primary">${item.price.toFixed(2)}</span>
             </div>
+            <button 
+              onClick={() => addToCart(item, 1, 'Дополнение')}
+              className="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center hover:bg-primary-container hover:text-on-primary-container transition-colors"
+            >
+              <span className="material-symbols-outlined">add</span>
+            </button>
           </div>
         ))}
       </div>

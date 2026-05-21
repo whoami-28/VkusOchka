@@ -9,8 +9,8 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 py-12 flex flex-col md:flex-row justify-between items-center gap-6">
         
         <div className="flex flex-col gap-2 items-center md:items-start">
-          <span className="text-lg font-bold text-stone-800 dark:text-stone-200">CulinaryCurated</span>
-          <span className="text-stone-500 dark:text-stone-400">© {currentYear} CulinaryCurated. Все права защищены.</span>
+          <span className="text-lg font-bold text-stone-800 dark:text-stone-200">Vkusochka</span>
+          <span className="text-stone-500 dark:text-stone-400">© {currentYear} Vkusochka. Все права защищены.</span>
         </div>
 
         <div className="flex flex-wrap justify-center gap-6">

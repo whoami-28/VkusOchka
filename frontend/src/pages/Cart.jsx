@@ -1,54 +1,67 @@
 import React from 'react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import { Link } from 'react-router-dom';
 import CartItem from '../components/cart/CartItem';
 import OrderSummary from '../components/cart/OrderSummary';
+import { useCart } from '../context/CartContext';
+import Button from '../ui/Button';
 
 export default function Cart() {
-  const cartItems = [
-    {
-      id: 1,
-      name: "Грибное ризотто с трюфелем",
-      price: "24.00",
-      category: "Итальянская кухня",
-      quantity: 1,
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCKvwaul0G7SoHN5mWI3YLuODmLdgO-LkVRgKB5kbc09Gat8l3hkgDH4NAt6RcPruQ1vsl5On76qsK2ZMt8WOZ-Ep8S-UcVagZmkF7kyAK4NKmjOkUCQybT_xm2unHhFMb3YeqoVI8U1StV2-uvRGg-TSwfPCsPvGzfKRtlKLuPS_c_xnzcnKsv6r-CAb6jBQnb9V7HtYBVHLeM7VyjjDImdM3LYzC9SQdjQZzV1MU8c3Z1mTHgeOq68aN81QWYlCQ38z8VlpZUJz0"
-    },
-    {
-      id: 2,
-      name: "Крафтовый бургер",
-      price: "18.50",
-      category: "Бургерная",
-      note: "Без лука, двойные огурчики",
-      quantity: 2,
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuC5vY6TW1TiYj9VQiKEgiHlNyA7RwE6-ZrHFsq2cYH3SNcozGlwpNxUksSArf3IZEnFGt0V0dJ1vUfW75KWZjBpcyA3YMXesaWTic25zGrzI4dM02mkN3yyvYUEP3UsbCbakVGQEicqYdJnxHUR-TMyjGpgAWeNZYQU5rvp26AK5XxURfdCtcgzfRXjYJIR7bsEwlNCWxmEOwTGztLYsH9pKjL7sYGxZwvFd_-y5M0DRO1kzRxG1lVSk7m-DlsVBeCEZfomJpACN60"
-    }
-  ];
+  const { cartItems, clearCart, getItemsCount } = useCart();
+
+  if (cartItems.length === 0) {
+    return (
+      <div className="flex-grow max-w-7xl mx-auto w-full px-margin-mobile md:px-lg py-xl flex flex-col items-center justify-center pt-32 text-center min-h-[70vh]">
+        <div className="w-40 h-40 mb-6 bg-surface-container rounded-full flex items-center justify-center border border-outline-variant/30 shadow-sm">
+          <span className="material-symbols-outlined text-[64px] text-tertiary">shopping_basket</span>
+        </div>
+        <h1 className="font-h1 text-[32px] text-on-surface mb-4">Ваша корзина пуста</h1>
+        <p className="font-body-md text-on-surface-variant mb-8 max-w-md">
+          Похоже, вы еще ничего не добавили. Перейдите в каталог, чтобы найти вкусные блюда.
+        </p>
+        <Link to="/">
+          <Button className="px-8 py-3">В каталог</Button>
+        </Link>
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-background text-on-background min-h-screen flex flex-col font-body-md">
-      <Header />
-      
-      <main className="flex-grow pt-[120px] pb-xl px-margin-mobile md:px-6 max-w-7xl mx-auto w-full">
-        <h1 className="font-h1 text-h1 text-on-surface mb-lg">Корзина</h1>
-        
-        <div className="flex flex-col lg:flex-row gap-lg">
-          <div className="flex-1 space-y-md">
-            {cartItems.map(item => (
-              <CartItem key={item.id} item={item} />
-            ))}
-          </div>
-          
-          <OrderSummary 
-            subtotal="61.00" 
-            deliveryFee="4.99" 
-            serviceFee="2.50" 
-            total="68.49" 
-          />
-        </div>
-      </main>
+    <div className="flex-grow max-w-7xl mx-auto w-full px-margin-mobile md:px-lg py-lg md:py-xl pt-28">
+      <div className="flex items-center gap-xs text-tertiary font-label-md mb-md">
+        <Link to="/" className="hover:text-primary">Главная</Link>
+        <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+        <span className="text-on-surface">Корзина</span>
+      </div>
 
-      <Footer />
+      <div className="flex justify-between items-end mb-lg">
+        <h1 className="font-h1 text-[32px] md:text-[40px] text-on-surface leading-none">Корзина</h1>
+        <button 
+          onClick={clearCart} 
+          className="font-label-md text-error hover:underline flex items-center gap-1 mb-1 transition-colors"
+        >
+          <span className="material-symbols-outlined text-[18px]">delete_sweep</span>
+          Очистить всё
+        </button>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-xl">
+        <div className="lg:col-span-8 flex flex-col">
+          <div className="bg-surface rounded-2xl border border-outline-variant/30 p-4 md:p-6 mb-6 shadow-sm">
+            <h2 className="font-h2 text-h2 text-on-surface mb-4 border-b border-outline-variant/30 pb-4">
+              Состав заказа ({getItemsCount()})
+            </h2>
+            <div className="flex flex-col">
+              {cartItems.map((item, index) => (
+                <CartItem key={`${item.id}-${item.note}-${index}`} item={item} />
+              ))}
+            </div>
+          </div>
+        </div>
+        
+        <div className="lg:col-span-4">
+          <OrderSummary />
+        </div>
+      </div>
     </div>
   );
 }

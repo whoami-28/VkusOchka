@@ -1,71 +1,55 @@
 import React from 'react';
 import Button from '../../ui/Button';
 
-export default function CheckoutSummary() {
+export default function CheckoutSummary({ cartItems, subtotal, deliveryFee, serviceFee, total, isSubmitting }) {
   return (
-    <div className="sticky top-[120px] bg-surface-container border border-outline-variant/20 rounded-xl p-md flex flex-col gap-md">
-      <h2 className="font-h2 text-h2 text-on-surface">Ваш заказ</h2>
+    <div className="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/30 sticky top-28">
+      <h2 className="font-h2 text-h2 text-on-surface mb-6">Ваш заказ</h2>
       
-      <div className="flex flex-col gap-sm border-b border-outline-variant/20 pb-md">
-        <div className="flex justify-between items-start">
-          <div className="flex gap-sm">
-            <div className="font-label-md text-label-md bg-surface-container-highest text-on-surface w-6 h-6 flex items-center justify-center rounded">1</div>
-            <div>
-              <p className="font-label-md text-label-md text-on-surface">Truffle Risotto</p>
-              <p className="font-body-md text-body-md text-tertiary text-sm">Extra parmesan</p>
+      <div className="flex flex-col gap-3 mb-6 border-b border-outline-variant/30 pb-6 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+        {cartItems.map((item, idx) => (
+          <div key={idx} className="flex justify-between items-start gap-4">
+            <div className="flex gap-3">
+              <span className="font-label-md text-primary-container">{item.quantity}x</span>
+              <div className="flex flex-col">
+                <span className="font-label-md text-on-surface line-clamp-1">{item.name}</span>
+                {item.note && <span className="font-label-sm text-tertiary truncate max-w-[150px]">{item.note}</span>}
+              </div>
             </div>
+            <span className="font-label-md text-on-surface">${(item.price * item.quantity).toFixed(2)}</span>
           </div>
-          <p className="font-label-md text-label-md text-on-surface">$24.00</p>
-        </div>
-        <div className="flex justify-between items-start">
-          <div className="flex gap-sm">
-            <div className="font-label-md text-label-md bg-surface-container-highest text-on-surface w-6 h-6 flex items-center justify-center rounded">2</div>
-            <div>
-              <p className="font-label-md text-label-md text-on-surface">Artisan Burrata</p>
-            </div>
-          </div>
-          <p className="font-label-md text-label-md text-on-surface">$36.00</p>
-        </div>
+        ))}
       </div>
 
-      <div className="flex gap-sm border-b border-outline-variant/20 pb-md">
-        <input 
-          type="text" 
-          placeholder="Промокод" 
-          className="flex-grow bg-surface-container-lowest border border-tertiary/20 rounded-lg px-sm py-2 font-body-md text-body-md focus:border-primary-container focus:ring-1 focus:ring-primary-container outline-none transition-colors placeholder:text-tertiary/50" 
-        />
-        <button className="bg-transparent border border-tertiary/50 text-on-surface font-label-md text-label-md px-sm rounded-lg hover:border-on-surface transition-colors">
-          Применить
-        </button>
-      </div>
-
-      <div className="flex flex-col gap-xs font-body-md text-body-md text-on-surface-variant">
-        <div className="flex justify-between">
-          <span>Сумма</span>
-          <span>$60.00</span>
+      <div className="flex flex-col gap-4 mb-6 border-b border-outline-variant/30 pb-6">
+        <div className="flex justify-between font-body-md text-on-surface-variant">
+          <span>Сумма заказа</span>
+          <span>${subtotal.toFixed(2)}</span>
         </div>
-        <div className="flex justify-between">
+        <div className="flex justify-between font-body-md text-on-surface-variant">
           <span>Доставка</span>
-          <span>$4.99</span>
+          <span>${deliveryFee.toFixed(2)}</span>
         </div>
-        <div className="flex justify-between">
-          <span>Налоги и сборы</span>
-          <span>$5.85</span>
+        <div className="flex justify-between font-body-md text-on-surface-variant">
+          <span>Сервисный сбор</span>
+          <span>${serviceFee.toFixed(2)}</span>
         </div>
       </div>
-
-      <div className="flex justify-between items-center pt-sm border-t border-outline-variant/20">
-        <span className="font-h2 text-h2 text-on-surface">Итого</span>
-        <span className="font-h2 text-h2 text-on-surface">$70.84</span>
-      </div>
-
-      <Button className="w-full rounded-full mt-sm">
-        Оформить заказ
-        <span className="material-symbols-outlined">arrow_forward</span>
-      </Button>
       
-      <p className="text-center font-body-md text-[12px] text-tertiary mt-2">
-        Оформляя заказ, вы соглашаетесь с условиями сервиса.
+      <div className="flex justify-between items-center mb-8">
+        <span className="font-h1 text-[20px] text-on-surface">Итого к оплате</span>
+        <span className="font-h1 text-[24px] text-primary-container">${total.toFixed(2)}</span>
+      </div>
+      
+      <Button 
+        type="submit" 
+        className="w-full py-4 text-[16px]" 
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? 'Обработка...' : 'Подтвердить заказ'}
+      </Button>
+      <p className="text-center font-label-sm text-tertiary mt-4">
+        Нажимая кнопку, вы соглашаетесь с условиями обработки данных
       </p>
     </div>
   );

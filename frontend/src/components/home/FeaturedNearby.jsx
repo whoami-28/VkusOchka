@@ -4,21 +4,34 @@ import { Link } from 'react-router-dom';
 export default function FeaturedNearby() {
   const [restaurants, setRestaurants] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch('https://localhost:5147/api/restaurants')
-      .then(res => res.json())
+    fetch('http://localhost:5147/api/restaurants')
+      .then(res => {
+        if (!res.ok) throw new Error('Ошибка сервера');
+        return res.json();
+      })
       .then(data => {
         setRestaurants(data);
         setIsLoading(false);
       })
       .catch(err => {
+        setError(err.message);
         setIsLoading(false);
       });
   }, []);
 
   if (isLoading) {
-    return <div className="p-md text-center text-on-surface">Загрузка...</div>;
+    return <div className="p-md text-center text-on-surface">Загрузка ресторанов...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="p-md text-center text-error border border-error/20 rounded-xl bg-error/5 my-md">
+        Не удалось загрузить рестораны. Проверь, запущен ли бэкенд Vkusochka на порту 7001.
+      </div>
+    );
   }
 
   return (

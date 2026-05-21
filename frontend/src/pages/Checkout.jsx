@@ -1,54 +1,119 @@
-import React from 'react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import CartItem from '../components/cart/CartItem';
-import OrderSummary from '../components/cart/OrderSummary';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
+import DeliveryAddress from '../components/checkout/DeliveryAddress';
+import PaymentMethod from '../components/checkout/PaymentMethod';
+import CheckoutSummary from '../components/checkout/CheckoutSummary';
 
-export default function Cart() {
-  const cartItems = [
-    {
-      id: 1,
-      name: "Грибное ризотто с трюфелем",
-      price: "24.00",
-      category: "Итальянская кухня",
-      quantity: 1,
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCKvwaul0G7SoHN5mWI3YLuODmLdgO-LkVRgKB5kbc09Gat8l3hkgDH4NAt6RcPruQ1vsl5On76qsK2ZMt8WOZ-Ep8S-UcVagZmkF7kyAK4NKmjOkUCQybT_xm2unHhFMb3YeqoVI8U1StV2-uvRGg-TSwfPCsPvGzfKRtlKLuPS_c_xnzcnKsv6r-CAb6jBQnb9V7HtYBVHLeM7VyjjDImdM3LYzC9SQdjQZzV1MU8c3Z1mTHgeOq68aN81QWYlCQ38z8VlpZUJz0"
-    },
-    {
-      id: 2,
-      name: "Крафтовый бургер",
-      price: "18.50",
-      category: "Бургерная",
-      note: "Без лука, двойные огурчики",
-      quantity: 2,
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuC5vY6TW1TiYj9VQiKEgiHlNyA7RwE6-ZrHFsq2cYH3SNcozGlwpNxUksSArf3IZEnFGt0V0dJ1vUfW75KWZjBpcyA3YMXesaWTic25zGrzI4dM02mkN3yyvYUEP3UsbCbakVGQEicqYdJnxHUR-TMyjGpgAWeNZYQU5rvp26AK5XxURfdCtcgzfRXjYJIR7bsEwlNCWxmEOwTGztLYsH9pKjL7sYGxZwvFd_-y5M0DRO1kzRxG1lVSk7m-DlsVBeCEZfomJpACN60"
+export default function Checkout() {
+  const { cartItems, getCartTotal, clearCart } = useCart();
+  const navigate = useNavigate();
+  const [paymentState, setPaymentState] = useState('idle');
+  
+  const [formData, setFormData] = useState({
+    street: '',
+    apartment: '',
+    entrance: '',
+    floor: '',
+    intercom: '',
+    comment: '',
+    paymentMethod: 'card',
+    selectedCardId: '1'
+  });
+
+  const subtotal = getCartTotal();
+  const deliveryFee = 2.99;
+  const serviceFee = 1.50;
+  const total = subtotal + deliveryFee + serviceFee;
+
+  if (cartItems.length === 0 && paymentState === 'idle') {
+    return (
+      <div className="flex-grow max-w-7xl mx-auto w-full px-margin-mobile md:px-lg py-xl pt-32 text-center">
+        <h1 className="font-h1 text-[32px] text-on-surface mb-4">Оформление невозможно</h1>
+        <p className="font-body-md text-on-surface-variant mb-8">Сначала добавьте блюда в корзину.</p>
+        <Link to="/" className="text-primary-container hover:underline font-label-md">Вернуться в каталог</Link>
+      </div>
+    );
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!formData.street) {
+      alert('Пожалуйста, укажите улицу и дом');
+      return;
     }
-  ];
+    
+    setPaymentState('processing');
+    
+    setTimeout(() => {
+      setPaymentState('success');
+      
+      const orderId = Math.floor(100000 + Math.random() * 900000);
+      const newOrder = {
+        id: orderId,
+        date: new Date().toLocaleDateString('ru-RU'),
+        status: 'Готовится',
+        items: [...cartItems],
+        total: total,
+        address: formData.street
+      };
+      
+      const existingOrders = JSON.parse(localStorage.getItem('vkusochka_orders') || '[]');
+      localStorage.setItem('vkusochka_orders', JSON.stringify([newOrder, ...existingOrders]));
+
+      setTimeout(() => {
+        clearCart();
+        navigate('/profile/history', { replace: true });
+      }, 2000);
+    }, 2500);
+  };
 
   return (
-    <div className="bg-background text-on-background min-h-screen flex flex-col font-body-md">
-      <Header />
-      
-      <main className="flex-grow pt-[120px] pb-xl px-margin-mobile md:px-6 max-w-7xl mx-auto w-full">
-        <h1 className="font-h1 text-h1 text-on-surface mb-lg">Корзина</h1>
+    <>
+      {paymentState === 'processing' && (
+        <div className="fixed inset-0 bg-background/90 backdrop-blur-sm z-[100] flex flex-col items-center justify-center">
+          <div className="w-16 h-16 border-4 border-outline-variant border-t-primary-container rounded-full animate-spin mb-6"></div>
+          <h2 className="font-h1 text-[28px] text-on-surface mb-2">Обработка платежа</h2>
+          <p className="font-body-md text-on-surface-variant">Связываемся с банком...</p>
+        </div>
+      )}
+
+      {paymentState === 'success' && (
+        <div className="fixed inset-0 bg-primary-container z-[100] flex flex-col items-center justify-center text-on-primary-container transition-opacity duration-500">
+          <span className="material-symbols-outlined text-[96px] mb-6 animate-bounce">check_circle</span>
+          <h2 className="font-h1 text-[36px] mb-2">Оплата прошла успешно!</h2>
+          <p className="font-body-lg opacity-90">Заказ передан на кухню.</p>
+        </div>
+      )}
+
+      <div className="flex-grow max-w-7xl mx-auto w-full px-margin-mobile md:px-lg py-lg md:py-xl pt-28">
+        <div className="flex items-center gap-xs text-tertiary font-label-md mb-md">
+          <Link to="/cart" className="hover:text-primary flex items-center gap-1">
+            <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+            Вернуться в корзину
+          </Link>
+        </div>
+
+        <h1 className="font-h1 text-[32px] md:text-[40px] text-on-surface mb-lg">Оформление заказа</h1>
         
-        <div className="flex flex-col lg:flex-row gap-lg">
-          <div className="flex-1 space-y-md">
-            {cartItems.map(item => (
-              <CartItem key={item.id} item={item} />
-            ))}
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-xl relative">
+          <div className="lg:col-span-8 flex flex-col">
+            <DeliveryAddress formData={formData} setFormData={setFormData} />
+            <PaymentMethod formData={formData} setFormData={setFormData} />
           </div>
           
-          <OrderSummary 
-            subtotal="61.00" 
-            deliveryFee="4.99" 
-            serviceFee="2.50" 
-            total="68.49" 
-          />
-        </div>
-      </main>
-
-      <Footer />
-    </div>
+          <div className="lg:col-span-4">
+            <CheckoutSummary 
+              cartItems={cartItems}
+              subtotal={subtotal}
+              deliveryFee={deliveryFee}
+              serviceFee={serviceFee}
+              total={total}
+              isSubmitting={paymentState !== 'idle'}
+            />
+          </div>
+        </form>
+      </div>
+    </>
   );
 }

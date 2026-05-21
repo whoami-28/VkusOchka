@@ -1,34 +1,182 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+import Button from '../../ui/Button';
 
-export default function DeliveryAddress() {
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+function MapClickHandler({ setPosition, setAddress, setIsLoading }) {
+  useMapEvents({
+    click: async (e) => {
+      const { lat, lng } = e.latlng;
+      setPosition([lat, lng]);
+      setIsLoading(true);
+      try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+        const data = await response.json();
+        if (data && data.address) {
+          const street = data.address.road || data.address.pedestrian || data.address.suburb || '';
+          const house = data.address.house_number || '';
+          const fullStreet = street ? `${street}${house ? ', ' + house : ''}` : 'Адрес не определен';
+          setAddress(fullStreet);
+        }
+      } catch (error) {
+        setAddress('Ошибка определения адреса');
+      } finally {
+        setIsLoading(false);
+      }
+    },
+  });
+  return null;
+}
+
+export default function DeliveryAddress({ formData, setFormData }) {
+  const [isMapOpen, setIsMapOpen] = useState(false);
+  const [mapPosition, setMapPosition] = useState([55.7558, 37.6173]);
+  const [tempAddress, setTempAddress] = useState('Кликните на карту для выбора адреса');
+  const [isLoadingAddress, setIsLoadingAddress] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleConfirmMap = () => {
+    if (tempAddress !== 'Кликните на карту для выбора адреса' && tempAddress !== 'Ошибка определения адреса' && tempAddress !== 'Адрес не определен') {
+      setFormData(prev => ({ ...prev, street: tempAddress }));
+    }
+    setIsMapOpen(false);
+  };
+
   return (
-    <section className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-md">
-      <div className="flex items-center justify-between mb-md">
-        <h2 className="font-h2 text-h2 text-on-surface">Адрес доставки</h2>
-        <button className="font-label-md text-label-md text-primary-container hover:text-primary transition-colors flex items-center gap-xs">
-          <span className="material-symbols-outlined text-[18px]">edit</span>
-          Изменить
-        </button>
-      </div>
-      <div className="flex flex-col md:flex-row gap-md">
-        <div className="flex-1 font-body-md text-body-md text-on-surface-variant">
-          <p className="font-label-md text-on-surface mb-xs">Дом</p>
-          <p>123 Culinary Boulevard, Apt 4B</p>
-          <p>Gastronomy District</p>
-          <p>New York, NY 10012</p>
-          <p className="mt-sm flex items-center gap-xs text-tertiary">
-            <span className="material-symbols-outlined text-[16px]">schedule</span>
-            Ожидаемая доставка: 30-45 мин
-          </p>
+    <>
+      <section className="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/30 mb-6 relative">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="font-h2 text-h2 text-on-surface flex items-center gap-2">
+            <span className="material-symbols-outlined text-primary-container">location_on</span>
+            Адрес доставки
+          </h2>
+          <button 
+            type="button"
+            onClick={() => setIsMapOpen(true)}
+            className="flex items-center gap-1 font-label-md text-primary-container hover:underline"
+          >
+            <span className="material-symbols-outlined text-[18px]">map</span>
+            Выбрать на карте
+          </button>
         </div>
-        <div className="w-full md:w-[200px] h-[120px] rounded-lg overflow-hidden border border-outline-variant/20 bg-surface-container-low flex items-center justify-center relative">
-          <img 
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPuMpiH2X_GiwF0hJA9UDUhyFyrBvI3ad3fRjKfF4KLMGfleLSh6_1JbBN9F2AukLWN-LwkDkICydn-ssPPe5zsamPlp-yAi0HkpO28GRH3L8Xw0_BJLWSQBOf8tTOjjONkIhX3Ai9TrU04rmC1Qb3F9JMN8Qzf3XC3qcd9Vkyoxxio7vemsdcdkaDFJEcqR9p9mh7ebZdFdH4b__5LtRXeGJqKynGDVyMFMb42lyS7uOAZfJS7a6d6UpVN1Dq0noLmHDXOPhhzxs" 
-            alt="Map location" 
-            className="w-full h-full object-cover absolute inset-0" 
-          />
+        
+        <div className="flex flex-col gap-4">
+          <div>
+            <label className="font-label-sm text-tertiary mb-1 block">Улица и дом *</label>
+            <input 
+              type="text" 
+              name="street"
+              value={formData.street}
+              onChange={handleChange}
+              placeholder="ул. Пушкина, д. 10"
+              className="w-full bg-surface border border-outline-variant/50 rounded-xl px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+              required
+            />
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+              <label className="font-label-sm text-tertiary mb-1 block">Квартира</label>
+              <input 
+                type="text" 
+                name="apartment"
+                value={formData.apartment}
+                onChange={handleChange}
+                className="w-full bg-surface border border-outline-variant/50 rounded-xl px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+              />
+            </div>
+            <div>
+              <label className="font-label-sm text-tertiary mb-1 block">Подъезд</label>
+              <input 
+                type="text" 
+                name="entrance"
+                value={formData.entrance}
+                onChange={handleChange}
+                className="w-full bg-surface border border-outline-variant/50 rounded-xl px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+              />
+            </div>
+            <div>
+              <label className="font-label-sm text-tertiary mb-1 block">Этаж</label>
+              <input 
+                type="text" 
+                name="floor"
+                value={formData.floor}
+                onChange={handleChange}
+                className="w-full bg-surface border border-outline-variant/50 rounded-xl px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+              />
+            </div>
+            <div>
+              <label className="font-label-sm text-tertiary mb-1 block">Домофон</label>
+              <input 
+                type="text" 
+                name="intercom"
+                value={formData.intercom}
+                onChange={handleChange}
+                className="w-full bg-surface border border-outline-variant/50 rounded-xl px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="font-label-sm text-tertiary mb-1 block">Комментарий курьеру</label>
+            <textarea 
+              name="comment"
+              value={formData.comment}
+              onChange={handleChange}
+              placeholder="Например: оставьте у двери, не звоните в звонок..."
+              rows="2"
+              className="w-full bg-surface border border-outline-variant/50 rounded-xl px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors resize-none"
+            ></textarea>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      {isMapOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsMapOpen(false)}></div>
+          <div className="bg-surface w-full max-w-4xl h-[80vh] rounded-3xl overflow-hidden relative z-10 flex flex-col shadow-2xl animate-fade-in">
+            <div className="p-4 border-b border-outline-variant/30 flex justify-between items-center bg-surface">
+              <h2 className="font-h2 text-h2 text-on-surface">Укажите точку на карте</h2>
+              <button type="button" onClick={() => setIsMapOpen(false)} className="p-2 text-on-surface-variant hover:text-error transition-colors">
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            <div className="flex-grow relative z-0">
+              <MapContainer center={mapPosition} zoom={13} style={{ height: '100%', width: '100%' }}>
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <Marker position={mapPosition} />
+                <MapClickHandler setPosition={setMapPosition} setAddress={setTempAddress} setIsLoading={setIsLoadingAddress} />
+              </MapContainer>
+            </div>
+            <div className="p-6 bg-surface flex flex-col md:flex-row items-center justify-between gap-4 relative z-10">
+              <div className="flex-grow">
+                <span className="font-label-sm text-tertiary block mb-1">Выбранный адрес:</span>
+                <span className="font-h2 text-on-surface block min-h-[28px]">
+                  {isLoadingAddress ? 'Определяем...' : tempAddress}
+                </span>
+              </div>
+              <Button type="button" onClick={handleConfirmMap} className="w-full md:w-auto px-8 flex-shrink-0">
+                Подтвердить
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

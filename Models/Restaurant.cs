@@ -1,4 +1,4 @@
-namespace Vkusochka.Models
+namespace FoodDelivery.Models
 {
     public class Restaurant
     {

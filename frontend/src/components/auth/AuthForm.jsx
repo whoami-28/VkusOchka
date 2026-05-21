@@ -1,64 +1,105 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Button from '../../ui/Button';
 
-export default function AuthForm({ isLogin }) {
-  const [showPassword, setShowPassword] = useState(false);
+export default function AuthForm({ type }) {
+  const navigate = useNavigate();
+  const isLogin = type === 'login';
+  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
+
+    const url = isLogin 
+      ? 'http://localhost:5147/api/auth/login' 
+      : 'http://localhost:5147/api/auth/register';
+
+    const payload = isLogin 
+      ? { email: formData.email, password: formData.password }
+      : { name: formData.name, email: formData.email, password: formData.password };
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || data || 'Ошибка авторизации');
+      }
+
+      if (!isLogin) {
+        const loginResponse = await fetch('http://localhost:5147/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: formData.email, password: formData.password })
+        });
+        const loginData = await loginResponse.json();
+        if (loginResponse.ok) {
+          localStorage.setItem('vkusochka_token', loginData.token);
+          localStorage.setItem('vkusochka_user', JSON.stringify(loginData.user));
+          navigate('/profile/history', { replace: true });
+        }
+      } else {
+        localStorage.setItem('vkusochka_token', data.token);
+        localStorage.setItem('vkusochka_user', JSON.stringify(data.user));
+        navigate('/profile/history', { replace: true });
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <form className="flex flex-col gap-gutter">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      {error && (
+        <div className="bg-error/10 text-error p-3 rounded-xl font-body-md text-sm">
+          {error}
+        </div>
+      )}
       {!isLogin && (
-        <div className="flex flex-col gap-xs">
-          <label htmlFor="name" className="font-label-sm text-label-sm text-on-surface-variant">Имя</label>
+        <div>
+          <label className="font-label-sm text-tertiary mb-1 block">Имя</label>
           <input 
             type="text" 
-            id="name" 
-            placeholder="Иван Иванов" 
-            className="w-full bg-surface-container-lowest border border-outline-variant rounded focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all py-sm px-gutter font-body-md text-body-md text-on-surface placeholder:text-outline-variant h-[48px]" 
+            value={formData.name}
+            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+            className="w-full bg-surface border border-outline-variant/50 rounded-xl px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+            required
           />
         </div>
       )}
-
-      <div className="flex flex-col gap-xs">
-        <label htmlFor="email" className="font-label-sm text-label-sm text-on-surface-variant">Email</label>
+      <div>
+        <label className="font-label-sm text-tertiary mb-1 block">Email</label>
         <input 
           type="email" 
-          id="email" 
-          placeholder="name@example.com" 
-          className="w-full bg-surface-container-lowest border border-outline-variant rounded focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all py-sm px-gutter font-body-md text-body-md text-on-surface placeholder:text-outline-variant h-[48px]" 
+          value={formData.email}
+          onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+          className="w-full bg-surface border border-outline-variant/50 rounded-xl px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+          required
         />
       </div>
-
-      <div className="flex flex-col gap-xs">
-        <div className="flex justify-between items-center">
-          <label htmlFor="password" className="font-label-sm text-label-sm text-on-surface-variant">Пароль</label>
-          {isLogin && (
-            <Link to="/forgot-password" className="font-label-sm text-label-sm text-primary-container hover:text-primary transition-colors">
-              Забыли пароль?
-            </Link>
-          )}
-        </div>
-        <div className="relative">
-          <input 
-            type={showPassword ? "text" : "password"} 
-            id="password" 
-            placeholder="••••••••" 
-            className="w-full bg-surface-container-lowest border border-outline-variant rounded focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all py-sm pl-gutter pr-lg font-body-md text-body-md text-on-surface placeholder:text-outline-variant h-[48px]" 
-          />
-          <button 
-            type="button" 
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-sm top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors"
-          >
-            <span className="material-symbols-outlined text-[20px]" style={showPassword ? { fontVariationSettings: "'FILL' 1" } : {}}>
-              {showPassword ? "visibility_off" : "visibility"}
-            </span>
-          </button>
-        </div>
+      <div>
+        <label className="font-label-sm text-tertiary mb-1 block">Пароль</label>
+        <input 
+          type="password" 
+          value={formData.password}
+          onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+          className="w-full bg-surface border border-outline-variant/50 rounded-xl px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors"
+          required
+        />
       </div>
-
-      <Button type="submit" className="w-full mt-sm">
-        {isLogin ? 'Войти' : 'Зарегистрироваться'}
+      <Button type="submit" className="w-full mt-2 py-3" disabled={isLoading}>
+        {isLoading ? 'Загрузка...' : (isLogin ? 'Войти' : 'Зарегистрироваться')}
       </Button>
     </form>
   );

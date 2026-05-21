@@ -1,60 +1,41 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import AuthForm from '../components/auth/AuthForm';
-import SocialAuth from '../components/auth/SocialAuth';
 
 export default function Auth() {
-  const [isLogin, setIsLogin] = useState(true);
+  const [authType, setAuthType] = useState('login');
 
   return (
-    <div className="bg-background min-h-screen relative flex flex-col font-body-md text-on-surface antialiased">
-      <div className="absolute inset-0 z-0">
-        <img 
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEIIpq376IzEVPDoGeQhlRwf1XPm6Y1hjkY0jFlSSlqkcq1SsR5PohJkKXBBe5ER-m1n6DFxX3Ncx3Z5Pic9wFGyX4tyclfqUG_O0d-cZnFBaAXTbP6VTg8sl4H5VppAknhTNOVjsLsB_QfIvNNzBgRffRXaK_6HNkAgRGXDgmLE3j9yGVfPIZ8feykjoqULZNN9g2Z5HDK1mr1mzre21krZJrBDBARyBz1hUUF6AyW_ZqpUFgHxF6cY0LW_kS-tuGt2NnLsWSJ2w" 
-          alt="Фон" 
-          className="w-full h-full object-cover opacity-60" 
-        />
-        <div className="absolute inset-0 bg-surface/40"></div>
-      </div>
+    <div className="min-h-screen bg-surface flex flex-col justify-center items-center p-4">
+      <div className="w-full max-w-md bg-surface-container-low border border-outline-variant/30 rounded-3xl overflow-hidden shadow-sm">
+        <div className="p-8 pb-6 text-center border-b border-outline-variant/30">
+          <Link to="/" className="inline-block mb-4">
+            <h1 className="font-h1 text-[32px] text-on-surface leading-none">Vkusochka</h1>
+          </Link>
+          <p className="font-body-md text-on-surface-variant">
+            {authType === 'login' ? 'С возвращением! Войдите в аккаунт.' : 'Создайте аккаунт, чтобы продолжить.'}
+          </p>
+        </div>
 
-      <main className="relative z-10 flex-grow flex items-center justify-center p-margin-mobile md:p-md w-full max-w-7xl mx-auto">
-        <div className="bg-surface/85 backdrop-blur-[12px] border border-outline-variant/20 w-full max-w-[480px] rounded-xl shadow-[0_8px_32px_rgba(40,40,39,0.08)] overflow-hidden flex flex-col">
-          
-          <div className="p-lg pb-md text-center">
-            <h1 className="font-h1 text-h1 text-on-surface mb-xs">Vkusochka</h1>
-            <p className="font-body-md text-body-md text-on-surface-variant">Ощутите вкус качества.</p>
-          </div>
-
-          <div className="flex border-b border-outline-variant/30 px-lg">
+        <div className="p-8">
+          <div className="flex bg-surface-container rounded-xl p-1 mb-6">
             <button 
-              onClick={() => setIsLogin(true)}
-              className={`flex-1 py-sm font-label-md text-label-md transition-colors text-center border-b-2 ${isLogin ? 'text-primary border-primary' : 'text-on-surface-variant hover:text-on-surface border-transparent'}`}
+              onClick={() => setAuthType('login')}
+              className={`flex-1 py-2 rounded-lg font-label-md transition-all ${authType === 'login' ? 'bg-surface shadow-sm text-on-surface' : 'text-on-surface-variant hover:text-on-surface'}`}
             >
               Вход
             </button>
             <button 
-              onClick={() => setIsLogin(false)}
-              className={`flex-1 py-sm font-label-md text-label-md transition-colors text-center border-b-2 ${!isLogin ? 'text-primary border-primary' : 'text-on-surface-variant hover:text-on-surface border-transparent'}`}
+              onClick={() => setAuthType('register')}
+              className={`flex-1 py-2 rounded-lg font-label-md transition-all ${authType === 'register' ? 'bg-surface shadow-sm text-on-surface' : 'text-on-surface-variant hover:text-on-surface'}`}
             >
               Регистрация
             </button>
           </div>
 
-          <div className="p-lg flex flex-col gap-md">
-            <AuthForm isLogin={isLogin} />
-            <SocialAuth />
-          </div>
-
-          <div className="bg-surface-container-low p-md text-center border-t border-outline-variant/30">
-            <p className="font-body-md text-body-md text-on-surface-variant">
-              {isLogin ? "Нет аккаунта? " : "Уже есть аккаунт? "}
-              <button onClick={() => setIsLogin(!isLogin)} className="text-primary-container font-label-md text-label-md hover:text-primary transition-colors">
-                {isLogin ? 'Зарегистрироваться' : 'Войти'}
-              </button>
-            </p>
-          </div>
-
+          <AuthForm type={authType} />
         </div>
-      </main>
+      </div>
     </div>
   );
 }

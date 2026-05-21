@@ -162,3 +162,5 @@ D:\01_Temp\Projects\Vkusochka\obj\Debug\net10.0\ref\Vkusochka.dll
 D:\01_Temp\Projects\Vkusochka\bin\Debug\net10.0\frontend\package-lock.json
 D:\01_Temp\Projects\Vkusochka\bin\Debug\net10.0\frontend\package.json
 D:\01_Temp\Projects\Vkusochka\obj\Debug\net10.0\Vkusochka.sourcelink.json
+D:\01_Temp\Projects\Vkusochka\bin\Debug\net10.0\BCrypt-Net-Next.dll
+D:\01_Temp\Projects\Vkusochka\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll

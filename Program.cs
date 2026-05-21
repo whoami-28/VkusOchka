@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using FoodDelivery.Models;
+using FoodDelivery.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,12 +17,21 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy.WithOrigins("http://localhost:5173")
-                    .AllowAnyHeader()
-                    .AllowAnyMethod();
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
         });
 });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<AppDbContext>();
+    
+    context.Database.Migrate();
+    DbInitializer.Initialize(context);
+}
 
 if (app.Environment.IsDevelopment())
 {
@@ -30,11 +40,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseCors("AllowReactApp");
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

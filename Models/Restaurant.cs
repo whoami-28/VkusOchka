@@ -1,6 +1,4 @@
-using System.Text.Json.Serialization;
-
-namespace FoodDelivery.Models
+namespace Vkusochka.Models
 {
     public class Restaurant
     {
@@ -8,9 +6,8 @@ namespace FoodDelivery.Models
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public double Rating { get; set; }
-        public string? ImageUrl { get; set; }
-
-        [JsonIgnore] public List<Dish> Dishes { get; set; } = new();
-        [JsonIgnore] public List<RestaurantKitchen> RestaurantKitchens { get; set; } = new();
+        public string? Image { get; set; }
+        public ICollection<Dish> Dishes { get; set; } = new List<Dish>();
+        public ICollection<RestaurantKitchen> RestaurantKitchens { get; set; } = new List<RestaurantKitchen>();
     }
 }

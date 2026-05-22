@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Vkusochka.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260522154747_InitNewDb")]
-    partial class InitNewDb
+    [Migration("20260522155630_CleanSetup")]
+    partial class CleanSetup
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

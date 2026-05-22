@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace FoodDelivery.Models
 {
     public class Dish
@@ -9,6 +11,8 @@ namespace FoodDelivery.Models
         public decimal Price { get; set; }
         public string? Image { get; set; }
         public bool IsRecommended { get; set; }
+        
+        [JsonIgnore]
         public Restaurant? Restaurant { get; set; }
     }
 }

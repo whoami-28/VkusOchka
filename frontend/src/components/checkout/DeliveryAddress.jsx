@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -37,19 +37,50 @@ function MapClickHandler({ setPosition, setAddress, setIsLoading }) {
 }
 
 export default function DeliveryAddress({ formData, setFormData }) {
+  const [savedAddresses, setSavedAddresses] = useState([]);
   const [isMapOpen, setIsMapOpen] = useState(false);
   const [mapPosition, setMapPosition] = useState([55.7558, 37.6173]);
   const [tempAddress, setTempAddress] = useState('Кликните на карту для выбора адреса');
   const [isLoadingAddress, setIsLoadingAddress] = useState(false);
+  const [saveToProfile, setSaveToProfile] = useState(true);
+
+  useEffect(() => {
+    const localAddrs = localStorage.getItem('vkusochka_addresses');
+    if (localAddrs) {
+      setSavedAddresses(JSON.parse(localAddrs));
+    } else {
+      const defaultAddrs = [
+        { id: 1, type: 'Дом', text: 'Ленинградский проспект, 39с79, кв. 45' },
+        { id: 2, type: 'Работа', text: 'ул. Пушкина, д. 10, офис 404' }
+      ];
+      localStorage.setItem('vkusochka_addresses', JSON.stringify(defaultAddrs));
+      setSavedAddresses(defaultAddrs);
+    }
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleSelectSaved = (addr) => {
+    setFormData(prev => ({ ...prev, street: addr.text }));
+  };
+
   const handleConfirmMap = () => {
     if (tempAddress !== 'Кликните на карту для выбора адреса' && tempAddress !== 'Ошибка определения адреса' && tempAddress !== 'Адрес не определен') {
       setFormData(prev => ({ ...prev, street: tempAddress }));
+      
+      if (saveToProfile) {
+        const newAddr = {
+          id: Date.now(),
+          type: 'Карта',
+          text: tempAddress
+        };
+        const updated = [...savedAddresses, newAddr];
+        setSavedAddresses(updated);
+        localStorage.setItem('vkusochka_addresses', JSON.stringify(updated));
+      }
     }
     setIsMapOpen(false);
   };
@@ -71,6 +102,21 @@ export default function DeliveryAddress({ formData, setFormData }) {
             Выбрать на карте
           </button>
         </div>
+
+        {savedAddresses.length > 0 && (
+          <div className="flex gap-2 overflow-x-auto pb-4 mb-4 border-b border-outline-variant/20 scrollbar-hide">
+            {savedAddresses.map(addr => (
+              <button
+                key={addr.id}
+                type="button"
+                onClick={() => handleSelectSaved(addr)}
+                className={`px-4 py-2 rounded-xl border text-sm transition-all flex-shrink-0 ${formData.street === addr.text ? 'bg-primary-container text-on-primary-container border-primary-container shadow-sm' : 'bg-surface text-on-surface-variant border-outline-variant/50 hover:bg-surface-container'}`}
+              >
+                {addr.type}: {addr.text.split(',')[0]}
+              </button>
+            ))}
+          </div>
+        )}
         
         <div className="flex flex-col gap-4">
           <div>
@@ -169,6 +215,15 @@ export default function DeliveryAddress({ formData, setFormData }) {
                 <span className="font-h2 text-on-surface block min-h-[28px]">
                   {isLoadingAddress ? 'Определяем...' : tempAddress}
                 </span>
+                <label className="flex items-center gap-2 mt-2 cursor-pointer select-none">
+                  <input 
+                    type="checkbox" 
+                    checked={saveToProfile}
+                    onChange={(e) => setSaveToProfile(e.target.checked)}
+                    className="rounded border-outline-variant text-primary-container focus:ring-primary-container"
+                  />
+                  <span className="font-label-sm text-on-surface-variant">Сохранить этот адрес в профиле</span>
+                </label>
               </div>
               <Button type="button" onClick={handleConfirmMap} className="w-full md:w-auto px-8 flex-shrink-0">
                 Подтвердить

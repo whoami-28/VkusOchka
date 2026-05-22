@@ -16,9 +16,21 @@ namespace FoodDelivery.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Restaurant>>> GetRestaurants()
+        public async Task<ActionResult<IEnumerable<Restaurant>>> GetRestaurants([FromQuery] string? search, [FromQuery] int? kitchenId)
         {
-            return await _context.Restaurants.ToListAsync();
+            IQueryable<Restaurant> query = _context.Restaurants;
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(r => r.Name.Contains(search) || r.Description.Contains(search));
+            }
+
+            if (kitchenId.HasValue)
+            {
+                query = query.Where(r => r.RestaurantKitchens.Any(rk => rk.KitchenId == kitchenId.Value));
+            }
+
+            return await query.ToListAsync();
         }
 
         [HttpGet("{id}")]

@@ -1,5 +1,5 @@
+using Microsoft.EntityFrameworkCore;
 using FoodDelivery.Models;
-using System.Linq;
 
 namespace FoodDelivery.Data
 {
@@ -7,65 +7,110 @@ namespace FoodDelivery.Data
     {
         public static void Initialize(AppDbContext context)
         {
-            if (context.Restaurants.Any())
+            if (context.Kitchens.Any())
             {
                 return;
             }
 
-            var r1 = new Restaurant 
-            { 
-                Name = "Osteria Francescana", 
-                Description = "Итальянская • Ресторан • $$$", 
-                Rating = 4.9, 
-                Image = "https://lh3.googleusercontent.com/aida-public/AB6AXuBMs2lzyoz89lpzIfWTlyjg8YY6ygNIEeL0GxlKiY1HL2WWm1deXiOhAdtaCAtAt0NazOWpc_vWO5aSeyWpTlN02xagzjKtY7rpwBo0YHihVjFmPOOivPpgn83kw6bBk3QXGEWjG0B_yOQF5jQoSVNCH-lkie0Ly8gnvNS1pOvLnCoxXj2DnHk0tLSjRhFlNUpZB6HYb1fSJOP3c1FYym18Fs_XSbG8yJzlbHuJ_Cl4VYMDoT1zlTxvdWGunlVBBzbYOOYVhIxm2-4" 
-            };
-            
-            var r2 = new Restaurant 
-            { 
-                Name = "Sushi Nakazawa", 
-                Description = "Японская • Суши • $$", 
-                Rating = 4.8, 
-                Image = "https://lh3.googleusercontent.com/aida-public/AB6AXuC3YozdwWIpl96e74z6iUVNJbG58cHp3qhqKQHpp5ex2Qpzd615rQS2JHsaviqTZ3FDit0ZvE0R8ZcW1seONu_b_JxmMRF9LQN6LXqfFBdP1gUDWJlKncvXKjJHV-KCGVfJ8ITvehCJoP-4_3PPfQdPIXKt0KLz2mVvB4IXpjxzEPXOIE2dZOC6swKkpf5ErxyaSMGUGYolmp5t-2Ec12uWeLw4c3FjNThhQ2SgwoGy24GNcGEFOYauziZmgDVC05U9wZVjsp3kusA" 
-            };
-            
-            var r3 = new Restaurant 
-            { 
-                Name = "The Golden Harvest", 
-                Description = "Фермерская • Американская • $$", 
-                Rating = 4.7, 
-                Image = "https://lh3.googleusercontent.com/aida-public/AB6AXuAf1v9_OEsCcN6Xp4Srp1m84n0XtTQSqg4f12KEob3FpkkMWYw7aFYlGXP-8xs0prvPh1_Xb_aBLEQUhO6SsKDMp3yGVwU_dKlWHG-DbEtbDlvpiTgcXlYAM3GZaO230SOBPqbzOkFYvQcuZekQCXi_dIkW2RncqU4byPdPporvg5YUWfVdutgWXyifR8FMky34cV2A11OE2Bo6Xc-Psp1hO5lnzYxieghBnQ3kt55X_xC9B2BmpLMqrAUdVZ9f8V1u4aoVV7vmMH0" 
-            };
-            
-            var r4 = new Restaurant 
-            { 
-                Name = "The Prime Cut Steakhouse", 
-                Description = "Стейки • Гриль • $$$", 
-                Rating = 4.9, 
-                Image = "https://lh3.googleusercontent.com/aida-public/AB6AXuAIUBe7VKH3z9CMd9hv_4zziGkPJsvy_wvQPgeDQ1FZgyy2RQkcaW5yjMUFyw-vVcW_m0ru4SWN-hPr6nVH5S0NrLJo89U-lsA8MEdAfdH-EQo4uWzlUcHRh74NlAU1XjlloKbgy0dphNZvEIWX05szWoAlzal-23f8muf7UO4tKkCO5Z7NRS-TYsq2NSf558qYL8Q3Fyk0E_7D6EjitqDVrWNVkZnmCf3qCEmO-T1VfsQAWnYxnsLZSuBpEcK-wFG74DgarnSvNaU" 
-            };
-            
-            var r5 = new Restaurant 
-            { 
-                Name = "The Burger Joint", 
-                Description = "Бургеры • Фастфуд • $", 
-                Rating = 4.6, 
-                Image = "https://lh3.googleusercontent.com/aida-public/AB6AXuC5vY6TW1TiYj9VQiKEgiHlNyA7RwE6-ZrHFsq2cYH3SNcozGlwpNxUksSArf3IZEnFGt0V0dJ1vUfW75KWZjBpcyA3YMXesaWTic25zGrzI4dM02mkN3yyvYUEP3UsbCbakVGQEicqYdJnxHUR-TMyjGpgAWeNZYQU5rvp26AK5XxURfdCtcgzfRXjYJIR7bsEwlNCWxmEOwTGztLYsH9pKjL7sYGxZwvFd_-y5M0DRO1kzRxG1lVSk7m-DlsVBeCEZfomJpACN60" 
+            var kitchens = new Kitchen[]
+            {
+                new Kitchen { Name = "Бургеры", Image = "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&h=500&fit=crop" },
+                new Kitchen { Name = "Пицца", Image = "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=500&h=500&fit=crop" },
+                new Kitchen { Name = "Суши", Image = "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=500&h=500&fit=crop" },
+                new Kitchen { Name = "Здоровая еда", Image = "https://images.unsplash.com/photo-1498579150354-979478841054?w=500&h=500&fit=crop" },
+                new Kitchen { Name = "Десерты", Image = "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=500&h=500&fit=crop" },
+                new Kitchen { Name = "Грузинская", Image = "https://images.unsplash.com/photo-1599321955726-e04842668d52?w=500&h=500&fit=crop" },
+                new Kitchen { Name = "Азиатская", Image = "https://images.unsplash.com/photo-1569058242253-1df34b084afa?w=500&h=500&fit=crop" },
+                new Kitchen { Name = "Кофе", Image = "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=500&h=500&fit=crop" },
+                new Kitchen { Name = "Итальянская", Image = "https://images.unsplash.com/photo-1498579150354-979478841054?w=500&h=500&fit=crop" },
+                new Kitchen { Name = "Мексиканская", Image = "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500&h=500&fit=crop" }
             };
 
-            context.Restaurants.AddRange(r1, r2, r3, r4, r5);
+            context.Kitchens.AddRange(kitchens);
+            context.SaveChanges();
+
+            var restaurants = new Restaurant[]
+            {
+                new Restaurant { Name = "Burger Empire", Description = "Лучшие бургеры в городе из мраморной говядины", Rating = "4.9", Image = "https://images.unsplash.com/photo-1550547660-d9450f859349?w=800&h=600&fit=crop" },
+                new Restaurant { Name = "Pizza Mafia", Description = "Настоящая неаполитанская пицца из дровяной печи", Rating = "4.8", Image = "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=800&h=600&fit=crop" },
+                new Restaurant { Name = "Tokyo Roll", Description = "Свежайшие суши и роллы от шефа", Rating = "4.7", Image = "https://images.unsplash.com/photo-1553621042-f6e147245754?w=800&h=600&fit=crop" },
+                new Restaurant { Name = "Green Bowl", Description = "Полезная еда, боулы и смузи", Rating = "4.9", Image = "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&h=600&fit=crop" },
+                new Restaurant { Name = "Sweet Tooth", Description = "Авторские десерты и спешелти кофе", Rating = "5.0", Image = "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=800&h=600&fit=crop" },
+                new Restaurant { Name = "Хинкальная №1", Description = "Традиционная грузинская кухня", Rating = "4.6", Image = "https://images.unsplash.com/photo-1627308595229-7830b5c91f9f?w=800&h=600&fit=crop" },
+                new Restaurant { Name = "Pasta La Vista", Description = "Домашняя итальянская паста ручной лепки", Rating = "4.8", Image = "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=800&h=600&fit=crop" },
+                new Restaurant { Name = "Wok N Roll", Description = "Жгучий вок и паназиатские специалитеты", Rating = "4.5", Image = "https://images.unsplash.com/photo-1552611052-33e04de081de?w=800&h=600&fit=crop" },
+                new Restaurant { Name = "Meat & Fire", Description = "Стейки, ребрышки и брискет из смокера", Rating = "4.9", Image = "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=800&h=600&fit=crop" },
+                new Restaurant { Name = "Taco Fiesta", Description = "Горячие тако, буррито и начос с гуакамоле", Rating = "4.7", Image = "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=800&h=600&fit=crop" }
+            };
+
+            context.Restaurants.AddRange(restaurants);
+            context.SaveChanges();
+
+            var restaurantKitchens = new RestaurantKitchen[]
+            {
+                new RestaurantKitchen { RestaurantId = restaurants[0].Id, KitchenId = kitchens[0].Id },
+                new RestaurantKitchen { RestaurantId = restaurants[1].Id, KitchenId = kitchens[1].Id },
+                new RestaurantKitchen { RestaurantId = restaurants[1].Id, KitchenId = kitchens[8].Id },
+                new RestaurantKitchen { RestaurantId = restaurants[2].Id, KitchenId = kitchens[2].Id },
+                new RestaurantKitchen { RestaurantId = restaurants[2].Id, KitchenId = kitchens[6].Id },
+                new RestaurantKitchen { RestaurantId = restaurants[3].Id, KitchenId = kitchens[3].Id },
+                new RestaurantKitchen { RestaurantId = restaurants[4].Id, KitchenId = kitchens[4].Id },
+                new RestaurantKitchen { RestaurantId = restaurants[4].Id, KitchenId = kitchens[7].Id },
+                new RestaurantKitchen { RestaurantId = restaurants[5].Id, KitchenId = kitchens[5].Id },
+                new RestaurantKitchen { RestaurantId = restaurants[6].Id, KitchenId = kitchens[8].Id },
+                new RestaurantKitchen { RestaurantId = restaurants[7].Id, KitchenId = kitchens[6].Id },
+                new RestaurantKitchen { RestaurantId = restaurants[8].Id, KitchenId = kitchens[0].Id },
+                new RestaurantKitchen { RestaurantId = restaurants[9].Id, KitchenId = kitchens[9].Id }
+            };
+
+            context.RestaurantKitchens.AddRange(restaurantKitchens);
             context.SaveChanges();
 
             var dishes = new Dish[]
             {
-                new Dish { RestaurantId = r1.Id, Name = "Грибное ризотто с трюфелем", Description = "Рис арборио, белые грибы, трюфельное масло, пармезан.", Price = 24.00m, Image = "https://lh3.googleusercontent.com/aida-public/AB6AXuCKvwaul0G7SoHN5mWI3YLuODmLdgO-LkVRgKB5kbc09Gat8l3hkgDH4NAt6RcPruQ1vsl5On76qsK2ZMt8WOZ-Ep8S-UcVagZmkF7kyAK4NKmjOkUCQybT_xm2unHhFMb3YeqoVI8U1StV2-uvRGg-TSwfPCsPvGzfKRtlKLuPS_c_xnzcnKsv6r-CAb6jBQnb9V7HtYBVHLeM7VyjjDImdM3LYzC9SQdjQZzV1MU8c3Z1mTHgeOq68aN81QWYlCQ38z8VlpZUJz0", IsRecommended = true },
-                new Dish { RestaurantId = r1.Id, Name = "Сырная тарелка", Description = "Ассорти фермерских сыров, соты, сезонный джем.", Price = 18.00m, Image = "https://lh3.googleusercontent.com/aida-public/AB6AXuBAWcDYt4wsRFDqeb6MJ1x6wB0bT8vDai0PfLm_uHou8G1DVHdmHHI_y5Ra1btWvmYXYriIFGv0Jncm1vyN_CAhb75wi2_o-w14vbyvJ7Tsy8oKm6CMjblDqnZAyZt-cQRN_X9znj3YjLcXu7bsukBfvJfU_B74i_Vltjs2AW2htzHhm3m3lzf7-j5V1oGWI9XqFhMKd-j6KJjfsrBBvUle6vrhIxR3CADJPoGjpIOjoGKT-FO-NQulFIWtoHSxYrQI4DaAUJoAz6c", IsRecommended = false },
-                new Dish { RestaurantId = r1.Id, Name = "Томатный суп", Description = "Запеченные фермерские томаты, чеснок и свежий базилик.", Price = 12.00m, Image = "https://lh3.googleusercontent.com/aida-public/AB6AXuBhbduNoYg59lgI1DQ_5fW-fR5YwBn5MveJQdzzpbWXKWP46KRUf58zGyvjbOjBaGN22006blcquhoCEpCH1q-pcLMIFxIYIyUgaQfckYehC1lAv33cKtjacOZVhRn1nWRYXGx9VoAg2OJmhwJjP5PZwKHWo1_syv0zMxnEtuSYxzKgFxDmFlDLflito-qPm1TxceY5DamO_k5U6aA7eG7D2Lq42L12fwXhlQjct5fp1hZGYk-KVJs13h6bjsyXhMgaPX9rWD_2VEY", IsRecommended = false },
-                new Dish { RestaurantId = r2.Id, Name = "Сет от шефа (12 шт)", Description = "Свежайшие суши и сашими, отобранные шефом.", Price = 45.00m, Image = "https://lh3.googleusercontent.com/aida-public/AB6AXuA--e8tCEd_Qhzv2RQ_SFTevDkyfspPZJn5KdoP-GLCezGovkZLbl-7F2QHfJOOdXwBzr12LF3BrRP0HqOU9pUgWtGiVp7JIsxEHORtmtPSAfuh1ltLFZXU_diuryXT7AJCZni1vnvVtFEVdKLDnBOwl0ztk2AkVR_jCiU2atSILuGPi7jG8bNyGbypSGqRM7CinvgNd7skGoJ6cArQykolFOdaUXx7vfAGxm_bTWuxsmgeDeBCGgOhaV0iuHWKA7KF8OLetg3seyI", IsRecommended = true },
-                new Dish { RestaurantId = r2.Id, Name = "Острый ролл с тунцом", Description = "Тунец, спайси соус, огурец, кунжут.", Price = 14.50m, Image = "https://lh3.googleusercontent.com/aida-public/AB6AXuDn1E-cK_2kYh27gaqLlusOx3W8D-N3j_ttRBZztMldzvYMcSFbrF6mYQ-MErDTxFXTNsDbuXuLW3OpK5UQkpeN3aLqT13vzhGsXudIkzVCj4C_4jOmcsEzg02otcESiw5MU8GB0t9w75ScGipBG_q6vhR0GFko4iGDISGKQOQJTmoHfQdABHK6LK3eT7o2II83YqG8tL6gJZeZWu0aqXb3a8E2QUmJ2fCwxV44tPUGsa7G45-e3gJcEcGiQktD27atg9ifeySbRaE", IsRecommended = false },
-                new Dish { RestaurantId = r3.Id, Name = "Боул 'Урожай'", Description = "Микс батата, кейла, киноа и нута.", Price = 14.95m, Image = "https://lh3.googleusercontent.com/aida-public/AB6AXuDSLCgtR3sOKEvei80z9MMpJOPy6A8T0A6qB2HXoUKk5jdW_mIq3Q5Opa0GV6jMbcFRY5wnoOkTKU9Qk64gjNYBqvWyfc8hU6zJrjTrGvRdqt6-SFEr0OdfrEwEUfrP71V4YcJ5012tQ8GmNrj6n0dU5kKa-jf_QNRAUCJY4uOBqNipOf0tm9NEp9eSqWIaw3m50SLr7WoU3GZfGnRIj5UrcFwHNTfJ_kEUh3RoL8KHqjFrzPSDxKsmrj8AV_koJcOWN5T0bx9lv2g", IsRecommended = true },
-                new Dish { RestaurantId = r3.Id, Name = "Каре ягненка в травах", Description = "Нежный ягненок в панировке из фисташек.", Price = 42.00m, Image = "https://lh3.googleusercontent.com/aida-public/AB6AXuAqZM4eIgKLuHPc6AmBMfbatm0LGVmKYYEQ426-Qg4ZsBB7uuuxSASNONRFMwAwbM2L4D_vEddAiCEHqI__hRIE7Hj-URT-1oKpBhgjTSP8f6EDAs-_8b12-UVF2K71i7LmzV0UXMcB1tbPsWUFa3PVlst_EP1PwpOagDuXYrB1SDzWokrjxoNewZpSK1jg5Sqizqhekt7Pj_37qRnz_CCxcxIF8tvggmW_d5ssw7ih36zG0zP70JnZsNjR4SZ6tIgSHglz9o2m9lY", IsRecommended = true },
-                new Dish { RestaurantId = r4.Id, Name = "Стейк Рибай 16oz", Description = "Мраморная говядина сухой выдержки.", Price = 55.00m, Image = "https://lh3.googleusercontent.com/aida-public/AB6AXuAIUBe7VKH3z9CMd9hv_4zziGkPJsvy_wvQPgeDQ1FZgyy2RQkcaW5yjMUFyw-vVcW_m0ru4SWN-hPr6nVH5S0NrLJo89U-lsA8MEdAfdH-EQo4uWzlUcHRh74NlAU1XjlloKbgy0dphNZvEIWX05szWoAlzal-23f8muf7UO4tKkCO5Z7NRS-TYsq2NSf558qYL8Q3Fyk0E_7D6EjitqDVrWNVkZnmCf3qCEmO-T1VfsQAWnYxnsLZSuBpEcK-wFG74DgarnSvNaU", IsRecommended = true },
-                new Dish { RestaurantId = r5.Id, Name = "Крафтовый бургер", Description = "Котлета из мраморной говядины, сыр чеддер.", Price = 18.50m, Image = "https://lh3.googleusercontent.com/aida-public/AB6AXuC5vY6TW1TiYj9VQiKEgiHlNyA7RwE6-ZrHFsq2cYH3SNcozGlwpNxUksSArf3IZEnFGt0V0dJ1vUfW75KWZjBpcyA3YMXesaWTic25zGrzI4dM02mkN3yyvYUEP3UsbCbakVGQEicqYdJnxHUR-TMyjGpgAWeNZYQU5rvp26AK5XxURfdCtcgzfRXjYJIR7bsEwlNCWxmEOwTGztLYsH9pKjL7sYGxZwvFd_-y5M0DRO1kzRxG1lVSk7m-DlsVBeCEZfomJpACN60", IsRecommended = true }
+                new Dish { RestaurantId = restaurants[0].Id, Name = "Чизбургер Классика", Description = "Говяжья котлета, чеддер, салат, томат, фирменный соус", Price = 8.99m, IsRecommended = true, Image = "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&h=400&fit=crop" },
+                new Dish { RestaurantId = restaurants[0].Id, Name = "Двойной Удар", Description = "Две сочные котлеты, бекон, халапеньо, сыр гауда", Price = 12.50m, IsRecommended = false, Image = "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=600&h=400&fit=crop" },
+                new Dish { RestaurantId = restaurants[0].Id, Name = "Трюфельный бургер", Description = "Котлета блэк ангус, трюфельный соус, карамелизованный лук", Price = 14.00m, IsRecommended = false, Image = "https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=600&h=400&fit=crop" },
+                new Dish { RestaurantId = restaurants[0].Id, Name = "Картофель фри", Description = "Золотистый хрустящий картофель", Price = 3.50m, IsRecommended = false, Image = "https://images.unsplash.com/photo-1576107232684-1279f390859f?w=600&h=400&fit=crop" },
+
+                new Dish { RestaurantId = restaurants[1].Id, Name = "Маргарита", Description = "Томатный соус, моцарелла, свежий базилик", Price = 10.00m, IsRecommended = true, Image = "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&h=400&fit=crop" },
+                new Dish { RestaurantId = restaurants[1].Id, Name = "Пепперони", Description = "Острая пепперони, моцарелла, томатный соус", Price = 11.50m, IsRecommended = false, Image = "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=600&h=400&fit=crop" },
+                new Dish { RestaurantId = restaurants[1].Id, Name = "Четыре сыра", Description = "Моцарелла, горгонзола, пармезан, эмменталь", Price = 13.00m, IsRecommended = false, Image = "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&h=400&fit=crop" },
+                new Dish { RestaurantId = restaurants[1].Id, Name = "Мясная пицца", Description = "Бекон, пепперони, ветчина, куриная грудка", Price = 15.50m, IsRecommended = false, Image = "https://images.unsplash.com/photo-1604382355076-af4b0eb60143?w=600&h=400&fit=crop" },
+
+                new Dish { RestaurantId = restaurants[2].Id, Name = "Филадельфия", Description = "Лосось, сливочный сыр, огурец", Price = 14.00m, IsRecommended = true, Image = "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600&h=400&fit=crop" },
+                new Dish { RestaurantId = restaurants[2].Id, Name = "Калифорния", Description = "Снежный краб, авокадо, огурец, тобико", Price = 12.00m, IsRecommended = false, Image = "https://images.unsplash.com/photo-1553621042-f6e147245754?w=600&h=400&fit=crop" },
+                new Dish { RestaurantId = restaurants[2].Id, Name = "Дракон", Description = "Угорь, авокадо, унаги соус, кунжут", Price = 16.50m, IsRecommended = false, Image = "https://images.unsplash.com/photo-1558985250-27a406d64cb3?w=600&h=400&fit=crop" },
+                new Dish { RestaurantId = restaurants[2].Id, Name = "Сет Самурай", Description = "Ассорти из 24 роллов", Price = 35.00m, IsRecommended = false, Image = "https://images.unsplash.com/photo-1611143669185-af224c5e3252?w=600&h=400&fit=crop" },
+
+                new Dish { RestaurantId = restaurants[3].Id, Name = "Боул с лососем", Description = "Киноа, лосось, авокадо, бобы эдамаме, чука", Price = 15.00m, IsRecommended = true, Image = "https://images.unsplash.com/photo-1498579150354-979478841054?w=600&h=400&fit=crop" },
+                new Dish { RestaurantId = restaurants[3].Id, Name = "Куриный боул", Description = "Бурый рис, куриное филе гриль, брокколи, томаты черри", Price = 12.50m, IsRecommended = false, Image = "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&h=400&fit=crop" },
+                new Dish { RestaurantId = restaurants[3].Id, Name = "Веган боул", Description = "Тофу, киноа, сладкий картофель, хумус", Price = 11.00m, IsRecommended = false, Image = "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=600&h=400&fit=crop" },
+                
+                new Dish { RestaurantId = restaurants[4].Id, Name = "Чизкейк Нью-Йорк", Description = "Классический песочный корж и нежный творожный сыр", Price = 6.50m, IsRecommended = true, Image = "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=600&h=400&fit=crop" },
+                new Dish { RestaurantId = restaurants[4].Id, Name = "Шоколадный фондан", Description = "Горячий кекс с жидким шоколадным центром", Price = 7.00m, IsRecommended = false, Image = "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=600&h=400&fit=crop" },
+                new Dish { RestaurantId = restaurants[4].Id, Name = "Макаронс сет", Description = "5 французских пирожных разных вкусов", Price = 9.00m, IsRecommended = false, Image = "https://images.unsplash.com/photo-1569864358642-9d1684040f43?w=600&h=400&fit=crop" },
+                new Dish { RestaurantId = restaurants[4].Id, Name = "Капучино", Description = "Эспрессо с густой молочной пенкой", Price = 4.00m, IsRecommended = false, Image = "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600&h=400&fit=crop" },
+
+                new Dish { RestaurantId = restaurants[5].Id, Name = "Хинкали классические", Description = "Сочные хинкали с говядиной и свининой (5 шт)", Price = 8.00m, IsRecommended = true, Image = "https://images.unsplash.com/photo-1627308595229-7830b5c91f9f?w=600&h=400&fit=crop" },
+                new Dish { RestaurantId = restaurants[5].Id, Name = "Хачапури по-аджарски", Description = "Лодочка из теста с сыром сулугуни и яйцом", Price = 9.50m, IsRecommended = false, Image = "https://images.unsplash.com/photo-1619597379201-92be0f5a7707?w=600&h=400&fit=crop" },
+                new Dish { RestaurantId = restaurants[5].Id, Name = "Шашлык из свинины", Description = "Мясо на углях с маринованным луком", Price = 14.50m, IsRecommended = false, Image = "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&h=400&fit=crop" },
+
+                new Dish { RestaurantId = restaurants[6].Id, Name = "Карбонара", Description = "Паста с гуанчиале, яичным желтком и пекорино", Price = 12.00m, IsRecommended = true, Image = "https://images.unsplash.com/photo-1612874742237-6526221588e3?w=600&h=400&fit=crop" },
+                new Dish { RestaurantId = restaurants[6].Id, Name = "Феттуччине Альфредо", Description = "Паста в сливочно-сырном соусе с курицей", Price = 13.50m, IsRecommended = false, Image = "https://images.unsplash.com/photo-1645112411341-6c4fd023714a?w=600&h=400&fit=crop" },
+                new Dish { RestaurantId = restaurants[6].Id, Name = "Лазанья", Description = "Слоистая паста с рагу болоньезе и бешамель", Price = 15.00m, IsRecommended = false, Image = "https://images.unsplash.com/photo-1574894709920-11b28e7367e3?w=600&h=400&fit=crop" },
+
+                new Dish { RestaurantId = restaurants[7].Id, Name = "Пад Тай", Description = "Тайская рисовая лапша с креветками и арахисом", Price = 13.00m, IsRecommended = true, Image = "https://images.unsplash.com/photo-1559314809-0d155014e29e?w=600&h=400&fit=crop" },
+                new Dish { RestaurantId = restaurants[7].Id, Name = "Удон с говядиной", Description = "Пшеничная лапша в соусе терияки с овощами", Price = 12.50m, IsRecommended = false, Image = "https://images.unsplash.com/photo-1617093727343-374698b1b08d?w=600&h=400&fit=crop" },
+                new Dish { RestaurantId = restaurants[7].Id, Name = "Том Ям", Description = "Острый тайский суп с морепродуктами", Price = 14.50m, IsRecommended = false, Image = "https://images.unsplash.com/photo-1548943487-a2e4e43b4859?w=600&h=400&fit=crop" },
+
+                new Dish { RestaurantId = restaurants[8].Id, Name = "Стейк Рибай", Description = "Премиальный отруб мраморной говядины", Price = 29.00m, IsRecommended = true, Image = "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600&h=400&fit=crop" },
+                new Dish { RestaurantId = restaurants[8].Id, Name = "Свиные ребрышки BBQ", Description = "Томленые ребра в фирменном соусе барбекю", Price = 19.50m, IsRecommended = false, Image = "https://images.unsplash.com/photo-1544025162-8111149f5038?w=600&h=400&fit=crop" },
+                new Dish { RestaurantId = restaurants[8].Id, Name = "Брискет", Description = "Копченая говяжья грудинка 12 часов томления", Price = 22.00m, IsRecommended = false, Image = "https://images.unsplash.com/photo-1596622527585-61ce4ce2f559?w=600&h=400&fit=crop" },
+
+                new Dish { RestaurantId = restaurants[9].Id, Name = "Тако Аль Пастор", Description = "Кукурузные лепешки со свининой и ананасом (3 шт)", Price = 11.00m, IsRecommended = true, Image = "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=600&h=400&fit=crop" },
+                new Dish { RestaurantId = restaurants[9].Id, Name = "Буррито с курицей", Description = "Пшеничная тортилья, рис, фасоль, курица, сальса", Price = 12.50m, IsRecommended = false, Image = "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=600&h=400&fit=crop" },
+                new Dish { RestaurantId = restaurants[9].Id, Name = "Начос Гранде", Description = "Кукурузные чипсы с сырным соусом, халапеньо и гуакамоле", Price = 9.00m, IsRecommended = false, Image = "https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=600&h=400&fit=crop" }
             };
 
             context.Dishes.AddRange(dishes);

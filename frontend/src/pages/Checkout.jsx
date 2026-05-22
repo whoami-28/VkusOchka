@@ -36,36 +36,57 @@ export default function Checkout() {
     );
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.street) {
       alert('Пожалуйста, укажите улицу и дом');
       return;
     }
+
+    const token = localStorage.getItem('vkusochka_token');
+    if (!token) {
+      alert('Пожалуйста, войдите в аккаунт для оформления заказа');
+      navigate('/auth');
+      return;
+    }
     
     setPaymentState('processing');
     
-    setTimeout(() => {
+    const orderPayload = {
+      address: formData.street,
+      total: total,
+      items: cartItems.map(item => ({
+        name: item.name + (item.note ? ` (${item.note})` : ''),
+        quantity: item.quantity,
+        price: item.price
+      }))
+    };
+
+    try {
+      const response = await fetch('http://localhost:5147/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(orderPayload)
+      });
+
+      if (!response.ok) {
+        throw new Error('Ошибка при создании заказа');
+      }
+
       setPaymentState('success');
       
-      const orderId = Math.floor(100000 + Math.random() * 900000);
-      const newOrder = {
-        id: orderId,
-        date: new Date().toLocaleDateString('ru-RU'),
-        status: 'Готовится',
-        items: [...cartItems],
-        total: total,
-        address: formData.street
-      };
-      
-      const existingOrders = JSON.parse(localStorage.getItem('vkusochka_orders') || '[]');
-      localStorage.setItem('vkusochka_orders', JSON.stringify([newOrder, ...existingOrders]));
-
       setTimeout(() => {
         clearCart();
         navigate('/profile/history', { replace: true });
       }, 2000);
-    }, 2500);
+      
+    } catch (error) {
+      alert('Произошла ошибка при оформлении заказа. Попробуйте еще раз.');
+      setPaymentState('idle');
+    }
   };
 
   return (

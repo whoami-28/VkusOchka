@@ -1,13 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from '../../ui/Button';
 
 export default function PaymentMethod({ formData, setFormData }) {
-  const [savedCards, setSavedCards] = useState([
-    { id: '1', last4: '4242', brand: 'Visa' },
-    { id: '2', last4: '8888', brand: 'Mastercard' }
-  ]);
+  const [savedCards, setSavedCards] = useState([]);
   const [isAddCardOpen, setIsAddCardOpen] = useState(false);
   const [newCard, setNewCard] = useState({ number: '', expiry: '', cvv: '' });
+
+  useEffect(() => {
+    const localCards = localStorage.getItem('vkusochka_cards');
+    if (localCards) {
+      setSavedCards(JSON.parse(localCards));
+    } else {
+      const defaultCards = [
+        { id: '1', last4: '4242', brand: 'Visa' },
+        { id: '2', last4: '8888', brand: 'Mastercard' }
+      ];
+      localStorage.setItem('vkusochka_cards', JSON.stringify(defaultCards));
+      setSavedCards(defaultCards);
+    }
+  }, []);
 
   const handleAddCard = () => {
     if (newCard.number.length < 16) {
@@ -18,7 +29,9 @@ export default function PaymentMethod({ formData, setFormData }) {
     const last4 = newCard.number.slice(-4);
     const newId = Date.now().toString();
     
-    setSavedCards(prev => [...prev, { id: newId, last4, brand }]);
+    const updatedCards = [...savedCards, { id: newId, last4, brand }];
+    setSavedCards(updatedCards);
+    localStorage.setItem('vkusochka_cards', JSON.stringify(updatedCards));
     setFormData(prev => ({ ...prev, paymentMethod: 'card', selectedCardId: newId }));
     setIsAddCardOpen(false);
     setNewCard({ number: '', expiry: '', cvv: '' });

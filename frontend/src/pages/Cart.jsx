@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import CartItem from '../components/cart/CartItem';
 import OrderSummary from '../components/cart/OrderSummary';
@@ -7,6 +7,31 @@ import Button from '../ui/Button';
 
 export default function Cart() {
   const { cartItems, clearCart, getItemsCount } = useCart();
+  const [templateName, setTemplateName] = useState('');
+
+  const handleSaveTemplate = () => {
+    if (!templateName.trim()) {
+      alert('Введите название для шаблона');
+      return;
+    }
+
+    const currentFavorites = JSON.parse(localStorage.getItem('vkusochka_favorites') || '[]');
+    const newTemplate = {
+      id: Date.now(),
+      name: templateName.trim(),
+      items: cartItems.map(item => ({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+        note: item.note || ''
+      }))
+    };
+
+    localStorage.setItem('vkusochka_favorites', JSON.stringify([newTemplate, ...currentFavorites]));
+    alert('Корзина успешно сохранена как шаблон в профиле!');
+    setTemplateName('');
+  };
 
   if (cartItems.length === 0) {
     return (
@@ -55,6 +80,22 @@ export default function Cart() {
                 <CartItem key={`${item.id}-${item.note}-${index}`} item={item} />
               ))}
             </div>
+          </div>
+
+          <div className="bg-surface-container-low border border-outline-variant/30 rounded-2xl p-5 shadow-sm flex flex-col md:flex-row items-center gap-4 mb-6">
+            <div className="flex-grow w-full">
+              <h3 className="font-label-md text-on-surface mb-1">Сохранить этот состав корзины</h3>
+              <input 
+                type="text"
+                value={templateName}
+                onChange={(e) => setTemplateName(e.target.value)}
+                placeholder="Например: Мой любимый обед, Пятничный ужин..."
+                className="w-full bg-surface border border-outline-variant/50 rounded-xl px-4 py-2.5 text-on-surface focus:outline-none focus:border-primary-container transition-colors text-sm"
+              />
+            </div>
+            <Button onClick={handleSaveTemplate} className="w-full md:w-auto px-6 py-2.5 self-end text-sm">
+              Сохранить как шаблон
+            </Button>
           </div>
         </div>
         

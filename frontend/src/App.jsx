@@ -5,6 +5,7 @@ import Layout from './components/Layout';
 import ScrollToTop from './components/ScrollToTop';
 
 import Home from './pages/Home';
+import Browse from './pages/Browse';
 import RestaurantMenu from './pages/RestaurantMenu';
 import ProductDetails from './pages/ProductDetails';
 import Cart from './pages/Cart';
@@ -20,6 +21,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
+            <Route path="browse" element={<Browse />} />
             <Route path="restaurant/:id" element={<RestaurantMenu />} />
             <Route path="product/:id" element={<ProductDetails />} />
             <Route path="cart" element={<Cart />} />

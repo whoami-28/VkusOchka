@@ -6,6 +6,7 @@ namespace FoodDelivery.Models
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
+        public string? Image { get; set; }
 
         [JsonIgnore] public List<RestaurantKitchen> RestaurantKitchens { get; set; } = new();
     }

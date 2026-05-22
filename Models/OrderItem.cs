@@ -1,16 +1,13 @@
-using System.Text.Json.Serialization;
-
 namespace FoodDelivery.Models
 {
     public class OrderItem
     {
         public int Id { get; set; }
         public int OrderId { get; set; }
-        public int DishId { get; set; }
+        public string ProductName { get; set; } = string.Empty;
         public int Quantity { get; set; }
-        public decimal PriceAtPurchase { get; set; } // Фиксируем цену на момент покупки
+        public decimal PriceAtPurchase { get; set; }
 
-        [JsonIgnore] public Order? Order { get; set; }
-        public Dish? Dish { get; set; }
+        public Order? Order { get; set; }
     }
 }

@@ -104,7 +104,7 @@ export default function DeliveryAddress({ formData, setFormData }) {
         </div>
 
         {savedAddresses.length > 0 && (
-          <div className="flex gap-2 overflow-x-auto pb-4 mb-4 border-b border-outline-variant/20 scrollbar-hide">
+          <div className="flex gap-2 overflow-x-auto pb-4 mb-4 border-b border-outline-variant/20 custom-scrollbar">
             {savedAddresses.map(addr => (
               <button
                 key={addr.id}

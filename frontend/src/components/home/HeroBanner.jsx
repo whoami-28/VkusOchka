@@ -54,7 +54,7 @@ export default function HeroBanner() {
       </div>
       <div className="w-full md:w-[45%] h-[300px] md:h-full relative overflow-hidden hidden md:block">
         <img
-          src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1000&h=800&fit=crop"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuDljrbMGfQ7te4CFOjUDZo0S5wRwsoUNYeCSasfZSGTU5SRi9LN3BQ_jFUtCtO25qW33gWZNCOL4ZKVpC6i8ENkwkdwZjVhKhhJ3Ii8jMPX5gnV7zPPq-NCeXPu9zUOE6b_F5QUWsU6hYhPMk8o13pJi_dHaqKprV5lSKFmf16RN_3kLXajYhYjiz6cBRgIrMtb9b0czM4HIklXj6LT0tjiwlHfpZga3kwMwGBVmR42DgRjfWSjhe1jYZ11Wy95658YH-b4tXY_HRk"
           alt="Вкусная еда"
           className="absolute inset-0 w-full h-full object-cover"
         />

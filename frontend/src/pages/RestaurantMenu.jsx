@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import RestaurantHero from '../components/menu/RestaurantHero';
 import DishCard from '../components/DishCard';
-import FloatingCartBar from '../components/menu/FloatingCartBar';
 
 export default function RestaurantMenu() {
   const { id } = useParams();
@@ -58,8 +57,6 @@ export default function RestaurantMenu() {
           </div>
         )}
       </div>
-
-      <FloatingCartBar />
     </div>
   );
 }

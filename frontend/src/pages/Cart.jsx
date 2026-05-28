@@ -43,7 +43,7 @@ export default function Cart() {
         <p className="font-body-md text-on-surface-variant mb-8 max-w-md">
           Похоже, вы еще ничего не добавили. Перейдите в каталог, чтобы найти вкусные блюда.
         </p>
-        <Link to="/">
+        <Link to="/browse">
           <Button className="px-8 py-3">В каталог</Button>
         </Link>
       </div>

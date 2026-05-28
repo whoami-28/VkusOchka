@@ -25,7 +25,7 @@ export default function CategoryCarousel() {
   return (
     <section>
       <h2 className="font-h2 text-h2 text-on-surface mb-6">Выбор по кухне</h2>
-      <div className="flex gap-4 md:gap-8 overflow-x-auto pb-4 scrollbar-hide">
+      <div className="flex gap-4 md:gap-8 overflow-x-auto pb-4 custom-scrollbar">
         {kitchens.map((kitchen, index) => (
           <Link
             key={kitchen.id}

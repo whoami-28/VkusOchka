@@ -32,7 +32,7 @@ export default function Checkout() {
       <div className="flex-grow max-w-7xl mx-auto w-full px-margin-mobile md:px-lg py-xl pt-32 text-center">
         <h1 className="font-h1 text-[32px] text-on-surface mb-4">Оформление невозможно</h1>
         <p className="font-body-md text-on-surface-variant mb-8">Сначала добавьте блюда в корзину.</p>
-        <Link to="/" className="text-primary-container hover:underline font-label-md">Вернуться в каталог</Link>
+        <Link to="/browse" className="text-primary-container hover:underline font-label-md">Вернуться в каталог</Link>
       </div>
     );
   }

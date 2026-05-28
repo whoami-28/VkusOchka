@@ -8,9 +8,31 @@ export function CartProvider({ children }) {
     return savedCart ? JSON.parse(savedCart) : [];
   });
 
+  const [promoCode, setPromoCode] = useState(() => localStorage.getItem('vkusochka_promo') || '');
+  const [discountPercent, setDiscountPercent] = useState(() => Number(localStorage.getItem('vkusochka_discount')) || 0);
+
   useEffect(() => {
     localStorage.setItem('vkusochka_cart', JSON.stringify(cartItems));
   }, [cartItems]);
+
+  const applyPromo = (code) => {
+    const cleanCode = code.trim().toUpperCase();
+    if (cleanCode === 'VKUS20') {
+      setPromoCode(cleanCode);
+      setDiscountPercent(20);
+      localStorage.setItem('vkusochka_promo', cleanCode);
+      localStorage.setItem('vkusochka_discount', '20');
+      return { success: true, message: 'Скидка 20% применена!' };
+    }
+    return { success: false, message: 'Неверный или просроченный промокод' };
+  };
+
+  const removePromo = () => {
+    setPromoCode('');
+    setDiscountPercent(0);
+    localStorage.removeItem('vkusochka_promo');
+    localStorage.removeItem('vkusochka_discount');
+  };
 
   const addToCart = (product, quantity = 1, note = '') => {
     setCartItems(prevItems => {
@@ -42,7 +64,10 @@ export function CartProvider({ children }) {
     ));
   };
 
-  const clearCart = () => setCartItems([]);
+  const clearCart = () => {
+    setCartItems([]);
+    removePromo();
+  };
 
   const getCartTotal = () => {
     return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
@@ -55,12 +80,16 @@ export function CartProvider({ children }) {
   return (
     <CartContext.Provider value={{
       cartItems,
+      promoCode,
+      discountPercent,
       addToCart,
       removeFromCart,
       updateQuantity,
       clearCart,
       getCartTotal,
-      getItemsCount
+      getItemsCount,
+      applyPromo,
+      removePromo
     }}>
       {children}
     </CartContext.Provider>

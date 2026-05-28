@@ -6,7 +6,7 @@ import PaymentMethod from '../components/checkout/PaymentMethod';
 import CheckoutSummary from '../components/checkout/CheckoutSummary';
 
 export default function Checkout() {
-  const { cartItems, getCartTotal, clearCart } = useCart();
+  const { cartItems, getCartTotal, clearCart, discountPercent } = useCart();
   const navigate = useNavigate();
   const [paymentState, setPaymentState] = useState('idle');
   
@@ -22,9 +22,10 @@ export default function Checkout() {
   });
 
   const subtotal = getCartTotal();
+  const discountAmount = (subtotal * discountPercent) / 100;
   const deliveryFee = 2.99;
   const serviceFee = 1.50;
-  const total = subtotal + deliveryFee + serviceFee;
+  const total = subtotal - discountAmount + deliveryFee + serviceFee;
 
   if (cartItems.length === 0 && paymentState === 'idle') {
     return (
@@ -127,6 +128,8 @@ export default function Checkout() {
             <CheckoutSummary 
               cartItems={cartItems}
               subtotal={subtotal}
+              discountAmount={discountAmount}
+              discountPercent={discountPercent}
               deliveryFee={deliveryFee}
               serviceFee={serviceFee}
               total={total}

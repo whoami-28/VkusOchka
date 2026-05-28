@@ -1,24 +1,24 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { useCart } from '../../context/CartContext';
 
-export default function MenuSidebar() {
+export default function FloatingCartBar() {
+  const { getItemsCount, getCartTotal } = useCart();
+  const itemsCount = getItemsCount();
+  const total = getCartTotal();
+
+  if (itemsCount === 0) return null;
+
   return (
-    <>
-      <aside className="md:w-1/4 hidden md:block sticky top-28 h-fit">
-        <h2 className="font-h2 text-h2 text-on-background mb-6">Категории</h2>
-        <ul className="flex flex-col gap-sm">
-          <li><a href="#starters" className="block py-2 font-label-md text-label-md text-primary font-bold border-l-4 border-primary-container pl-4 transition-all">Закуски</a></li>
-          <li><a href="#mains" className="block py-2 font-body-md text-body-md text-tertiary hover:text-on-background pl-5 transition-all">Горячие блюда</a></li>
-          <li><a href="#sides" className="block py-2 font-body-md text-body-md text-tertiary hover:text-on-background pl-5 transition-all">Гарниры</a></li>
-          <li><a href="#desserts" className="block py-2 font-body-md text-body-md text-tertiary hover:text-on-background pl-5 transition-all">Десерты</a></li>
-          <li><a href="#beverages" className="block py-2 font-body-md text-body-md text-tertiary hover:text-on-background pl-5 transition-all">Напитки</a></li>
-        </ul>
-      </aside>
-
-      <div className="md:hidden overflow-x-auto whitespace-nowrap pb-4 border-b border-surface-variant flex gap-sm hide-scrollbar">
-        <a href="#starters" className="px-4 py-2 bg-secondary-container text-on-secondary-container font-label-sm text-label-sm rounded-full inline-block">Закуски</a>
-        <a href="#mains" className="px-4 py-2 border border-outline-variant text-on-surface-variant font-label-sm text-label-sm rounded-full inline-block hover:bg-surface-container-low">Горячие блюда</a>
-        <a href="#sides" className="px-4 py-2 border border-outline-variant text-on-surface-variant font-label-sm text-label-sm rounded-full inline-block hover:bg-surface-container-low">Гарниры</a>
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-md bg-primary-container text-on-primary-container px-6 py-4 rounded-3xl shadow-xl z-50 flex justify-between items-center animate-fade-in border border-primary/20">
+      <div className="flex flex-col">
+        <span className="font-label-md font-bold text-[16px]">{itemsCount} блюд(а) в корзине</span>
+        <span className="font-h2 text-[20px]">${total.toFixed(2)}</span>
       </div>
-    </>
+      <Link to="/cart" className="bg-background text-on-surface px-6 py-3 rounded-xl font-label-md hover:scale-105 transition-transform shadow-md flex items-center gap-2">
+        Оформить
+        <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+      </Link>
+    </div>
   );
 }

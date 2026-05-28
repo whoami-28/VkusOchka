@@ -1,29 +1,66 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
-export default function RestaurantHero() {
+export default function RestaurantHero({ restaurant }) {
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  useEffect(() => {
+    const favs = JSON.parse(localStorage.getItem('vkusochka_fav_restaurants') || '[]');
+    setIsFavorite(favs.some(fav => fav.id === restaurant.id));
+  }, [restaurant.id]);
+
+  const toggleFavorite = () => {
+    const favs = JSON.parse(localStorage.getItem('vkusochka_fav_restaurants') || '[]');
+    let updatedFavs;
+    if (isFavorite) {
+      updatedFavs = favs.filter(fav => fav.id !== restaurant.id);
+    } else {
+      updatedFavs = [...favs, { id: restaurant.id, name: restaurant.name, image: restaurant.image }];
+    }
+    localStorage.setItem('vkusochka_fav_restaurants', JSON.stringify(updatedFavs));
+    setIsFavorite(!isFavorite);
+  };
+
   return (
-    <section className="relative w-full h-[400px] md:h-[500px]">
+    <div className="relative h-[300px] md:h-[400px] w-full mt-20">
       <img 
-        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAf1v9_OEsCcN6Xp4Srp1m84n0XtTQSqg4f12KEob3FpkkMWYw7aFYlGXP-8xs0prvPh1_Xb_aBLEQUhO6SsKDMp3yGVwU_dKlWHG-DbEtbDlvpiTgcXlYAM3GZaO230SOBPqbzOkFYvQcuZekQCXi_dIkW2RncqU4byPdPporvg5YUWfVdutgWXyifR8FMky34cV2A11OE2Bo6Xc-Psp1hO5lnzYxieghBnQ3kt55X_xC9B2BmpLMqrAUdVZ9f8V1u4aoVV7vmMH0" 
-        alt="The Golden Harvest" 
+        src={restaurant.image || "https://images.unsplash.com/photo-1550547660-d9450f859349?w=1200&h=400&fit=crop"} 
+        alt={restaurant.name} 
         className="w-full h-full object-cover" 
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
-      <div className="absolute bottom-0 left-0 w-full p-6 md:p-10 max-w-7xl mx-auto">
-        <h1 className="font-h1 text-h1 text-white mb-2">The Golden Harvest</h1>
-        <div className="flex flex-wrap items-center gap-4 text-white font-body-md text-body-md opacity-90">
-          <span className="flex items-center gap-1">
-            <span className="material-symbols-outlined text-primary-container" style={{ fontVariationSettings: "'FILL' 1" }}>star</span> 
-            4.8 (500+ оценок)
-          </span>
-          <span className="w-1 h-1 bg-white rounded-full"></span>
-          <span>Фермерская, Американская</span>
-          <span className="w-1 h-1 bg-white rounded-full"></span>
-          <span className="flex items-center gap-1">
-            <span className="material-symbols-outlined">schedule</span> 30-45 мин
-          </span>
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent"></div>
+      
+      <div className="absolute bottom-0 left-0 w-full p-margin-mobile md:p-lg max-w-7xl mx-auto flex justify-between items-end pb-8">
+        <div>
+          <h1 className="font-h1 text-[40px] md:text-[56px] text-on-surface leading-none mb-3">
+            {restaurant.name}
+          </h1>
+          <div className="flex flex-wrap items-center gap-3 text-on-surface-variant font-label-md">
+            <span className="flex items-center gap-1 bg-surface-container px-2 py-1 rounded-md text-on-surface">
+              <span className="material-symbols-outlined text-primary-container text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span> 
+              {restaurant.rating || "4.8"}
+            </span>
+            <span className="hidden md:inline">•</span>
+            <span className="bg-surface-container-low px-3 py-1 rounded-full border border-outline-variant/30">
+              {restaurant.description}
+            </span>
+          </div>
         </div>
+        
+        <button 
+          onClick={toggleFavorite} 
+          className="w-14 h-14 rounded-full bg-surface flex items-center justify-center text-on-surface hover:bg-surface-container transition-colors shadow-lg border border-outline-variant/30 flex-shrink-0"
+        >
+          <span 
+            className="material-symbols-outlined text-[28px] transition-colors duration-300" 
+            style={{ 
+              fontVariationSettings: isFavorite ? "'FILL' 1" : "'FILL' 0", 
+              color: isFavorite ? 'var(--color-primary-container)' : 'inherit' 
+            }}
+          >
+            favorite
+          </span>
+        </button>
       </div>
-    </section>
+    </div>
   );
 }

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Vkusochka.Migrations
 {
     /// <inheritdoc />
-    public partial class CleanSetup : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -68,7 +68,11 @@ namespace Vkusochka.Migrations
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsRecommended = table.Column<bool>(type: "bit", nullable: false)
+                    IsRecommended = table.Column<bool>(type: "bit", nullable: false),
+                    Calories = table.Column<int>(type: "int", nullable: false),
+                    Protein = table.Column<int>(type: "int", nullable: false),
+                    Carbs = table.Column<int>(type: "int", nullable: false),
+                    Fat = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {

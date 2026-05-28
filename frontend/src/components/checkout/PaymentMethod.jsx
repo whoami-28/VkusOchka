@@ -5,6 +5,7 @@ export default function PaymentMethod({ formData, setFormData }) {
   const [savedCards, setSavedCards] = useState([]);
   const [isAddCardOpen, setIsAddCardOpen] = useState(false);
   const [newCard, setNewCard] = useState({ number: '', expiry: '', cvv: '' });
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     const localCards = localStorage.getItem('vkusochka_cards');
@@ -20,13 +21,90 @@ export default function PaymentMethod({ formData, setFormData }) {
     }
   }, []);
 
-  const handleAddCard = () => {
-    if (newCard.number.length < 16) {
-      alert("Некорректный номер карты");
-      return;
+  const getCardBrand = (number) => {
+    const cleanNumber = number.replace(/\s/g, '');
+    if (/^4/.test(cleanNumber)) return 'Visa';
+    if (/^5[1-5]|^2[2-7]/.test(cleanNumber)) return 'Mastercard';
+    if (/^220[0-4]/.test(cleanNumber)) return 'МИР';
+    return 'Card';
+  };
+
+  const validateLuhn = (number) => {
+    const cleanNumber = number.replace(/\s/g, '');
+    if (!/^\d+$/.test(cleanNumber)) return false;
+    let sum = 0;
+    let shouldDouble = false;
+    for (let i = cleanNumber.length - 1; i >= 0; i--) {
+      let digit = parseInt(cleanNumber.charAt(i));
+      if (shouldDouble) {
+        if ((digit *= 2) > 9) digit -= 9;
+      }
+      sum += digit;
+      shouldDouble = !shouldDouble;
     }
-    const brand = newCard.number[0] === '4' ? 'Visa' : 'Mastercard';
-    const last4 = newCard.number.slice(-4);
+    return sum % 10 === 0;
+  };
+
+  const validateCardForm = () => {
+    const newErrors = {};
+    const cleanNumber = newCard.number.replace(/\s/g, '');
+
+    if (cleanNumber.length !== 16) {
+      newErrors.number = 'Номер карты должен состоять из 16 цифр';
+    } else if (!validateLuhn(cleanNumber)) {
+      newErrors.number = 'Неверный номер карты (проверка Луна отклонена)';
+    }
+
+    if (!/^\d{2}\/\d{2}$/.test(newCard.expiry)) {
+      newErrors.expiry = 'Формат должен быть ММ/ГГ';
+    } else {
+      const [month, year] = newCard.expiry.split('/').map(num => parseInt(num, 10));
+      if (month < 1 || month > 12) {
+        newErrors.expiry = 'Некорректный месяц (01-12)';
+      } else {
+        const now = new Date();
+        const currentMonth = now.getMonth() + 1;
+        const currentYear = parseInt(now.getFullYear().toString().slice(-2), 10);
+        if (year < currentYear || (year === currentYear && month < currentMonth)) {
+          newErrors.expiry = 'Срок действия карты истёк';
+        } else if (year > currentYear + 20) {
+          newErrors.expiry = 'Некорректный год';
+        }
+      }
+    }
+
+    if (!/^\d{3}$/.test(newCard.cvv)) {
+      newErrors.cvv = 'CVV должен состоять из 3 цифр';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleNumberChange = (e) => {
+    const value = e.target.value.replace(/\D/g, '');
+    const formatted = value.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
+    setNewCard(prev => ({ ...prev, number: formatted }));
+  };
+
+  const handleExpiryChange = (e) => {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length > 2) {
+      value = value.slice(0, 2) + '/' + value.slice(2, 4);
+    }
+    setNewCard(prev => ({ ...prev, expiry: value }));
+  };
+
+  const handleCvvChange = (e) => {
+    const value = e.target.value.replace(/\D/g, '');
+    setNewCard(prev => ({ ...prev, cvv: value }));
+  };
+
+  const handleAddCard = () => {
+    if (!validateCardForm()) return;
+
+    const brand = getCardBrand(newCard.number);
+    const last4 = newCard.number.replace(/\s/g, '').slice(-4);
     const newId = Date.now().toString();
     
     const updatedCards = [...savedCards, { id: newId, last4, brand }];
@@ -35,6 +113,7 @@ export default function PaymentMethod({ formData, setFormData }) {
     setFormData(prev => ({ ...prev, paymentMethod: 'card', selectedCardId: newId }));
     setIsAddCardOpen(false);
     setNewCard({ number: '', expiry: '', cvv: '' });
+    setErrors({});
   };
 
   return (
@@ -72,7 +151,7 @@ export default function PaymentMethod({ formData, setFormData }) {
                       >
                         <div className="flex items-center gap-3">
                           <span className="material-symbols-outlined text-tertiary">credit_card</span>
-                          <span className="font-body-md text-on-surface">• • • • {card.last4}</span>
+                          <span className="font-body-md text-on-surface">{card.brand} • • • • {card.last4}</span>
                         </div>
                         {formData.selectedCardId === card.id && (
                           <span className="material-symbols-outlined text-primary-container text-[20px]">check_circle</span>
@@ -82,7 +161,7 @@ export default function PaymentMethod({ formData, setFormData }) {
                     
                     <button 
                       type="button"
-                      onClick={() => setIsAddCardOpen(true)}
+                      onClick={() => { setIsAddCardOpen(true); setErrors({}); }}
                       className="flex items-center gap-2 p-3 rounded-lg border border-dashed border-outline-variant/70 text-on-surface-variant hover:text-primary-container hover:border-primary-container transition-all"
                     >
                       <span className="material-symbols-outlined text-[20px]">add</span>
@@ -100,7 +179,7 @@ export default function PaymentMethod({ formData, setFormData }) {
             </div>
             <input 
               type="radio" 
-              name="paymentMethod" 
+                name="paymentMethod" 
               value="cash" 
               checked={formData.paymentMethod === 'cash'}
               onChange={(e) => setFormData(prev => ({ ...prev, paymentMethod: e.target.value }))}
@@ -127,15 +206,23 @@ export default function PaymentMethod({ formData, setFormData }) {
 
             <div className="flex flex-col gap-4">
               <div>
-                <label className="font-label-sm text-tertiary mb-1 block">Номер карты</label>
+                <div className="flex justify-between items-center mb-1">
+                  <label className="font-label-sm text-tertiary block">Номер карты</label>
+                  {newCard.number && (
+                    <span className="text-xs font-bold px-2 py-0.5 bg-primary-container/20 text-primary-container rounded">
+                      {getCardBrand(newCard.number)}
+                    </span>
+                  )}
+                </div>
                 <input 
                   type="text" 
-                  maxLength="16"
+                  maxLength="19"
                   value={newCard.number}
-                  onChange={(e) => setNewCard(prev => ({ ...prev, number: e.target.value.replace(/\D/g, '') }))}
+                  onChange={handleNumberChange}
                   placeholder="0000 0000 0000 0000"
-                  className="w-full bg-background border border-outline-variant/50 rounded-xl px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors tracking-widest font-mono"
+                  className={`w-full bg-background border rounded-xl px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors tracking-widest font-mono ${errors.number ? 'border-error' : 'border-outline-variant/50'}`}
                 />
+                {errors.number && <p className="text-error text-xs mt-1 font-label-sm">{errors.number}</p>}
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -144,10 +231,11 @@ export default function PaymentMethod({ formData, setFormData }) {
                     type="text" 
                     maxLength="5"
                     value={newCard.expiry}
-                    onChange={(e) => setNewCard(prev => ({ ...prev, expiry: e.target.value }))}
-                    placeholder="MM/YY"
-                    className="w-full bg-background border border-outline-variant/50 rounded-xl px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-mono"
+                    onChange={handleExpiryChange}
+                    placeholder="ММ/ГГ"
+                    className={`w-full bg-background border rounded-xl px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-mono ${errors.expiry ? 'border-error' : 'border-outline-variant/50'}`}
                   />
+                  {errors.expiry && <p className="text-error text-xs mt-1 font-label-sm">{errors.expiry}</p>}
                 </div>
                 <div>
                   <label className="font-label-sm text-tertiary mb-1 block">CVV</label>
@@ -155,10 +243,11 @@ export default function PaymentMethod({ formData, setFormData }) {
                     type="password" 
                     maxLength="3"
                     value={newCard.cvv}
-                    onChange={(e) => setNewCard(prev => ({ ...prev, cvv: e.target.value.replace(/\D/g, '') }))}
+                    onChange={handleCvvChange}
                     placeholder="•••"
-                    className="w-full bg-background border border-outline-variant/50 rounded-xl px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-mono tracking-widest"
+                    className={`w-full bg-background border rounded-xl px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors font-mono tracking-widest ${errors.cvv ? 'border-error' : 'border-outline-variant/50'}`}
                   />
+                  {errors.cvv && <p className="text-error text-xs mt-1 font-label-sm">{errors.cvv}</p>}
                 </div>
               </div>
               <Button type="button" onClick={handleAddCard} className="w-full mt-4 py-3">

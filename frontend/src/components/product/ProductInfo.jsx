@@ -60,6 +60,25 @@ export default function ProductInfo({ product }) {
             ))}
           </div>
         </div>
+
+        <div className="mb-lg grid grid-cols-4 gap-sm bg-surface-container-low p-md rounded-xl border border-outline-variant/30">
+          <div className="flex flex-col items-center">
+            <span className="font-h2 text-on-surface">{product.calories}</span>
+            <span className="font-label-sm text-tertiary">ККАЛ</span>
+          </div>
+          <div className="flex flex-col items-center border-l border-outline-variant/30">
+            <span className="font-h2 text-on-surface">{product.protein}g</span>
+            <span className="font-label-sm text-tertiary">БЕЛ</span>
+          </div>
+          <div className="flex flex-col items-center border-l border-outline-variant/30">
+            <span className="font-h2 text-on-surface">{product.carbs}g</span>
+            <span className="font-label-sm text-tertiary">УГЛ</span>
+          </div>
+          <div className="flex flex-col items-center border-l border-outline-variant/30">
+            <span className="font-h2 text-on-surface">{product.fat}g</span>
+            <span className="font-label-sm text-tertiary">ЖИР</span>
+          </div>
+        </div>
       </div>
 
       <div className="mt-auto bg-surface py-md border-t border-outline-variant/30 md:border-none sticky bottom-0 z-40 md:static flex flex-col gap-sm">

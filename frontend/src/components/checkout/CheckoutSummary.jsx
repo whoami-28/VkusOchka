@@ -1,7 +1,7 @@
 import React from 'react';
 import Button from '../../ui/Button';
 
-export default function CheckoutSummary({ cartItems, subtotal, deliveryFee, serviceFee, total, isSubmitting }) {
+export default function CheckoutSummary({ cartItems, subtotal, discountAmount, discountPercent, deliveryFee, serviceFee, total, isSubmitting }) {
   return (
     <div className="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/30 sticky top-28">
       <h2 className="font-h2 text-h2 text-on-surface mb-6">Ваш заказ</h2>
@@ -26,6 +26,12 @@ export default function CheckoutSummary({ cartItems, subtotal, deliveryFee, serv
           <span>Сумма заказа</span>
           <span>${subtotal.toFixed(2)}</span>
         </div>
+        {discountAmount > 0 && (
+          <div className="flex justify-between font-body-md text-primary-container font-bold">
+            <span>Скидка ({discountPercent}%)</span>
+            <span>-${discountAmount.toFixed(2)}</span>
+          </div>
+        )}
         <div className="flex justify-between font-body-md text-on-surface-variant">
           <span>Доставка</span>
           <span>${deliveryFee.toFixed(2)}</span>

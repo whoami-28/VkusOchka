@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FoodDelivery.Models;
 using System.Security.Claims;
+using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
 namespace FoodDelivery.Controllers
@@ -29,14 +30,20 @@ namespace FoodDelivery.Controllers
             return Ok(new { user.Name, user.Email, user.BonusBalance });
         }
 
-        public class UpdateSettingsDto { public string Name { get; set; } = string.Empty; }
+        public class UpdateSettingsDto 
+        { 
+            [Required(ErrorMessage = "Имя обязательно")]
+            [StringLength(50, MinimumLength = 2, ErrorMessage = "Имя должно быть от 2 до 50 символов")]
+            [RegularExpression(@"^[a-zA-Zа-яА-ЯёЁ\s\-]+$", ErrorMessage = "Имя должно содержать только буквы, пробел и дефис")]
+            public string Name { get; set; } = string.Empty; 
+        }
 
         [HttpPut("settings")]
         public async Task<ActionResult> UpdateSettings([FromBody] UpdateSettingsDto dto)
         {
-            var name = dto.Name?.Trim();
-            if (string.IsNullOrEmpty(name) || name.Length < 2 || name.Length > 50 || name.Contains("--") || name.Contains("  ") || Regex.IsMatch(name, @"(.)\1{3,}") || !Regex.IsMatch(name, @"^[a-zA-Zа-яА-ЯёЁ\s\-]+$"))
-                return BadRequest(new { message = "Имя должно быть от 2 до 50 символов, содержать только буквы и не иметь подозрительных повторений." });
+            var name = dto.Name.Trim();
+            if (name.Contains("--") || name.Contains("  ") || Regex.IsMatch(name, @"(.)\1{3,}"))
+                return BadRequest(new { message = "Имя содержит недопустимые последовательности символов." });
 
             var user = await _context.Users.FindAsync(GetUserId());
             if (user == null) return NotFound();

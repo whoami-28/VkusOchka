@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Button from '../../ui/Button';
 
 export default function AuthForm({ type }) {
@@ -7,7 +6,6 @@ export default function AuthForm({ type }) {
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     setError('');
@@ -22,6 +20,11 @@ export default function AuthForm({ type }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    if (!formData.email.trim() || !formData.password.trim()) {
+      setError('Заполните email и пароль');
+      return;
+    }
+
     if (!isLogin) {
       const cleanName = formData.name.trim();
       if (cleanName.length < 2 || cleanName.length > 50) {
@@ -34,6 +37,10 @@ export default function AuthForm({ type }) {
       }
       if (cleanName.includes('--') || cleanName.includes('  ') || /(.)\1{3,}/.test(cleanName)) {
         setError('Имя содержит недопустимые символы или повторения');
+        return;
+      }
+      if (formData.password.length < 6) {
+        setError('Пароль должен содержать минимум 6 символов');
         return;
       }
     }
@@ -53,8 +60,7 @@ export default function AuthForm({ type }) {
       if (response.ok) {
         localStorage.setItem('vkusochka_token', data.token);
         localStorage.setItem('vkusochka_user', JSON.stringify(data.user));
-        navigate('/', { replace: true });
-        window.location.reload();
+        window.location.href = '/';
       } else {
         setError(data.message || 'Произошла ошибка');
       }
@@ -78,7 +84,7 @@ export default function AuthForm({ type }) {
             placeholder="Иван Иванов" 
             maxLength="50"
             className="w-full bg-surface border border-outline-variant/50 rounded-xl px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors" 
-            required 
+            required={!isLogin}
           />
         </div>
       )}

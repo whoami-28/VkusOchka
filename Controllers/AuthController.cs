@@ -31,6 +31,9 @@ namespace FoodDelivery.Controllers
             if (string.IsNullOrWhiteSpace(name) || name.Length < 2 || name.Length > 50 || name.Contains("--") || name.Contains("  ") || Regex.IsMatch(name, @"(.)\1{3,}") || !Regex.IsMatch(name, @"^[a-zA-Zа-яА-ЯёЁ\s\-]+$"))
                 return BadRequest(new { message = "Некорректное имя пользователя. Используйте только буквы, пробел или дефис (от 2 до 50 символов)." });
 
+            if (string.IsNullOrWhiteSpace(request.Password) || request.Password.Length < 6)
+                return BadRequest(new { message = "Пароль должен содержать минимум 6 символов." });
+
             if (await _context.Users.AnyAsync(u => u.Email.ToLower() == email))
                 return BadRequest(new { message = "Email уже используется" });
 
@@ -53,7 +56,7 @@ namespace FoodDelivery.Controllers
             var email = request.Email?.Trim().ToLower() ?? "";
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email);
 
-            if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+            if (user == null || string.IsNullOrEmpty(request.Password) || string.IsNullOrEmpty(user.PasswordHash) || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
                 return Unauthorized(new { message = "Неверный email или пароль" });
 
             return Ok(new { token = GenerateJwtToken(user), user = new { user.Name, user.Email } });
@@ -73,6 +76,8 @@ namespace FoodDelivery.Controllers
                     new Claim(ClaimTypes.Name, user.Name)
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
+                Issuer = jwtSettings["Issuer"],
+                Audience = jwtSettings["Audience"],
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
@@ -81,4 +86,4 @@ namespace FoodDelivery.Controllers
             return tokenHandler.WriteToken(token);
         }
     }
-}
+}       

@@ -1,13 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../ui/Button';
 
-export default function AuthForm() {
-  const [isLogin, setIsLogin] = useState(true);
+export default function AuthForm({ type }) {
+  const isLogin = type === 'login';
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setError('');
+    setFormData({ name: '', email: '', password: '' });
+  }, [type]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -48,7 +53,8 @@ export default function AuthForm() {
       if (response.ok) {
         localStorage.setItem('vkusochka_token', data.token);
         localStorage.setItem('vkusochka_user', JSON.stringify(data.user));
-        navigate(-1);
+        navigate('/', { replace: true });
+        window.location.reload();
       } else {
         setError(data.message || 'Произошла ошибка');
       }
@@ -108,17 +114,6 @@ export default function AuthForm() {
       <Button type="submit" className="w-full py-4 text-[16px] mt-2" disabled={isLoading}>
         {isLoading ? 'Загрузка...' : (isLogin ? 'Войти' : 'Создать аккаунт')}
       </Button>
-
-      <p className="text-center font-label-md text-on-surface-variant mt-2">
-        {isLogin ? 'Нет аккаунта?' : 'Уже есть аккаунт?'}
-        <button 
-          type="button" 
-          onClick={() => { setIsLogin(!isLogin); setError(''); }} 
-          className="text-primary-container hover:underline ml-2 font-bold"
-        >
-          {isLogin ? 'Зарегистрироваться' : 'Войти'}
-        </button>
-      </p>
     </form>
   );
 }

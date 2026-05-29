@@ -25,17 +25,20 @@ namespace FoodDelivery.Controllers
         [HttpPost("register")]
         public async Task<ActionResult> Register([FromBody] AuthRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.Name) || request.Name.Length < 2 || request.Name.Length > 50 || request.Name.Contains("--") || request.Name.Contains("  ") || Regex.IsMatch(request.Name, @"(.)\1{3,}") || !Regex.IsMatch(request.Name, @"^[a-zA-Zа-яА-ЯёЁ\s\-]+$"))
+            var email = request.Email?.Trim().ToLower() ?? "";
+            var name = request.Name?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(name) || name.Length < 2 || name.Length > 50 || name.Contains("--") || name.Contains("  ") || Regex.IsMatch(name, @"(.)\1{3,}") || !Regex.IsMatch(name, @"^[a-zA-Zа-яА-ЯёЁ\s\-]+$"))
                 return BadRequest(new { message = "Некорректное имя пользователя. Используйте только буквы, пробел или дефис (от 2 до 50 символов)." });
 
-            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+            if (await _context.Users.AnyAsync(u => u.Email.ToLower() == email))
                 return BadRequest(new { message = "Email уже используется" });
 
             var user = new User
             {
-                Email = request.Email,
+                Email = email,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-                Name = request.Name.Trim()
+                Name = name
             };
 
             _context.Users.Add(user);
@@ -47,7 +50,9 @@ namespace FoodDelivery.Controllers
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] AuthRequest request)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+            var email = request.Email?.Trim().ToLower() ?? "";
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email);
+
             if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
                 return Unauthorized(new { message = "Неверный email или пароль" });
 

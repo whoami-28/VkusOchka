@@ -45,16 +45,14 @@ export default function DeliveryAddress({ formData, setFormData }) {
   const [saveToProfile, setSaveToProfile] = useState(true);
 
   useEffect(() => {
-    const localAddrs = localStorage.getItem('vkusochka_addresses');
-    if (localAddrs) {
-      setSavedAddresses(JSON.parse(localAddrs));
-    } else {
-      const defaultAddrs = [
-        { id: 1, type: 'Дом', text: 'Ленинградский проспект, 39с79, кв. 45' },
-        { id: 2, type: 'Работа', text: 'ул. Пушкина, д. 10, офис 404' }
-      ];
-      localStorage.setItem('vkusochka_addresses', JSON.stringify(defaultAddrs));
-      setSavedAddresses(defaultAddrs);
+    const token = localStorage.getItem('vkusochka_token');
+    if (token) {
+      fetch('http://localhost:5147/api/profile/addresses', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      .then(res => res.json())
+      .then(data => setSavedAddresses(data))
+      .catch(() => {});
     }
   }, []);
 
@@ -64,7 +62,7 @@ export default function DeliveryAddress({ formData, setFormData }) {
   };
 
   const handleSelectSaved = (addr) => {
-    setFormData(prev => ({ ...prev, street: addr.text }));
+    setFormData(prev => ({ ...prev, street: addr.fullAddress }));
   };
 
   const handleConfirmMap = () => {
@@ -72,14 +70,22 @@ export default function DeliveryAddress({ formData, setFormData }) {
       setFormData(prev => ({ ...prev, street: tempAddress }));
       
       if (saveToProfile) {
-        const newAddr = {
-          id: Date.now(),
-          type: 'Карта',
-          text: tempAddress
-        };
-        const updated = [...savedAddresses, newAddr];
-        setSavedAddresses(updated);
-        localStorage.setItem('vkusochka_addresses', JSON.stringify(updated));
+        const token = localStorage.getItem('vkusochka_token');
+        if (token) {
+          fetch('http://localhost:5147/api/profile/addresses', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ fullAddress: tempAddress })
+          })
+          .then(res => res.json())
+          .then(data => {
+            setSavedAddresses(prev => [...prev, data]);
+          })
+          .catch(() => {});
+        }
       }
     }
     setIsMapOpen(false);
@@ -110,9 +116,9 @@ export default function DeliveryAddress({ formData, setFormData }) {
                 key={addr.id}
                 type="button"
                 onClick={() => handleSelectSaved(addr)}
-                className={`px-4 py-2 rounded-xl border text-sm transition-all flex-shrink-0 ${formData.street === addr.text ? 'bg-primary-container text-on-primary-container border-primary-container shadow-sm' : 'bg-surface text-on-surface-variant border-outline-variant/50 hover:bg-surface-container'}`}
+                className={`px-4 py-2 rounded-xl border text-sm transition-all flex-shrink-0 ${formData.street === addr.fullAddress ? 'bg-primary-container text-on-primary-container border-primary-container shadow-sm' : 'bg-surface text-on-surface-variant border-outline-variant/50 hover:bg-surface-container'}`}
               >
-                {addr.type}: {addr.text.split(',')[0]}
+                {addr.fullAddress.split(',')[0]}
               </button>
             ))}
           </div>

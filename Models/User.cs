@@ -13,5 +13,6 @@ namespace FoodDelivery.Models
         [JsonIgnore] public List<Address> Addresses { get; set; } = new();
         [JsonIgnore] public List<SavedCard> SavedCards { get; set; } = new();
         [JsonIgnore] public List<Cart> Carts { get; set; } = new();
+        [JsonIgnore] public List<FavoriteRestaurant> FavoriteRestaurants { get; set; } = new();
     }
 }

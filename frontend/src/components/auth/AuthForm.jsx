@@ -2,58 +2,58 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../ui/Button';
 
-export default function AuthForm({ type }) {
-  const navigate = useNavigate();
-  const isLogin = type === 'login';
+export default function AuthForm() {
+  const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
-  const [error, setError] = useState(null);
+  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setError('');
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
+    
+    if (!isLogin) {
+      const cleanName = formData.name.trim();
+      if (cleanName.length < 2 || cleanName.length > 50) {
+        setError('Имя должно содержать от 2 до 50 символов');
+        return;
+      }
+      if (!/^[a-zA-Zа-яА-ЯёЁ\s\-]+$/.test(cleanName)) {
+        setError('Имя может содержать только буквы, пробел или дефис');
+        return;
+      }
+      if (cleanName.includes('--') || cleanName.includes('  ') || /(.)\1{3,}/.test(cleanName)) {
+        setError('Имя содержит недопустимые символы или повторения');
+        return;
+      }
+    }
+
     setIsLoading(true);
-
-    const url = isLogin 
-      ? 'http://localhost:5147/api/auth/login' 
-      : 'http://localhost:5147/api/auth/register';
-
-    const payload = isLogin 
-      ? { email: formData.email, password: formData.password }
-      : { name: formData.name, email: formData.email, password: formData.password };
+    const endpoint = isLogin ? 'http://localhost:5147/api/auth/login' : 'http://localhost:5147/api/auth/register';
 
     try {
-      const response = await fetch(url, {
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(formData)
       });
 
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.message || data || 'Ошибка авторизации');
-      }
-
-      if (!isLogin) {
-        const loginResponse = await fetch('http://localhost:5147/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: formData.email, password: formData.password })
-        });
-        const loginData = await loginResponse.json();
-        if (loginResponse.ok) {
-          localStorage.setItem('vkusochka_token', loginData.token);
-          localStorage.setItem('vkusochka_user', JSON.stringify(loginData.user));
-          navigate('/profile/history', { replace: true });
-        }
-      } else {
+      if (response.ok) {
         localStorage.setItem('vkusochka_token', data.token);
         localStorage.setItem('vkusochka_user', JSON.stringify(data.user));
-        navigate('/profile/history', { replace: true });
+        navigate(-1);
+      } else {
+        setError(data.message || 'Произошла ошибка');
       }
     } catch (err) {
-      setError(err.message);
+      setError('Ошибка соединения с сервером');
     } finally {
       setIsLoading(false);
     }
@@ -61,46 +61,64 @@ export default function AuthForm({ type }) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      {error && (
-        <div className="bg-error/10 text-error p-3 rounded-xl font-body-md text-sm">
-          {error}
-        </div>
-      )}
       {!isLogin && (
         <div>
-          <label className="font-label-sm text-tertiary mb-1 block">Имя</label>
+          <label className="font-label-sm text-tertiary mb-1 block">Как к вам обращаться?</label>
           <input 
             type="text" 
-            value={formData.name}
-            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-            className="w-full bg-surface border border-outline-variant/50 rounded-xl px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors"
-            required
+            name="name" 
+            value={formData.name} 
+            onChange={handleChange} 
+            placeholder="Иван Иванов" 
+            maxLength="50"
+            className="w-full bg-surface border border-outline-variant/50 rounded-xl px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors" 
+            required 
           />
         </div>
       )}
       <div>
-        <label className="font-label-sm text-tertiary mb-1 block">Email</label>
+        <label className="font-label-sm text-tertiary mb-1 block">Электронная почта</label>
         <input 
           type="email" 
-          value={formData.email}
-          onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-          className="w-full bg-surface border border-outline-variant/50 rounded-xl px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors"
-          required
+          name="email" 
+          value={formData.email} 
+          onChange={handleChange} 
+          placeholder="example@mail.com" 
+          maxLength="100"
+          className="w-full bg-surface border border-outline-variant/50 rounded-xl px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors" 
+          required 
         />
       </div>
       <div>
         <label className="font-label-sm text-tertiary mb-1 block">Пароль</label>
         <input 
           type="password" 
-          value={formData.password}
-          onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-          className="w-full bg-surface border border-outline-variant/50 rounded-xl px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors"
-          required
+          name="password" 
+          value={formData.password} 
+          onChange={handleChange} 
+          placeholder="••••••••" 
+          maxLength="100"
+          className="w-full bg-surface border border-outline-variant/50 rounded-xl px-4 py-3 text-on-surface focus:outline-none focus:border-primary-container transition-colors" 
+          required 
         />
       </div>
-      <Button type="submit" className="w-full mt-2 py-3" disabled={isLoading}>
-        {isLoading ? 'Загрузка...' : (isLogin ? 'Войти' : 'Зарегистрироваться')}
+
+      {error && <p className="text-error font-label-sm text-sm">{error}</p>}
+
+      <Button type="submit" className="w-full py-4 text-[16px] mt-2" disabled={isLoading}>
+        {isLoading ? 'Загрузка...' : (isLogin ? 'Войти' : 'Создать аккаунт')}
       </Button>
+
+      <p className="text-center font-label-md text-on-surface-variant mt-2">
+        {isLogin ? 'Нет аккаунта?' : 'Уже есть аккаунт?'}
+        <button 
+          type="button" 
+          onClick={() => { setIsLogin(!isLogin); setError(''); }} 
+          className="text-primary-container hover:underline ml-2 font-bold"
+        >
+          {isLogin ? 'Зарегистрироваться' : 'Войти'}
+        </button>
+      </p>
     </form>
   );
 }

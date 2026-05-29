@@ -8,42 +8,21 @@ export default function PaymentMethod({ formData, setFormData }) {
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    const localCards = localStorage.getItem('vkusochka_cards');
-    if (localCards) {
-      setSavedCards(JSON.parse(localCards));
-    } else {
-      const defaultCards = [
-        { id: '1', last4: '4242', brand: 'Visa' },
-        { id: '2', last4: '8888', brand: 'Mastercard' }
-      ];
-      localStorage.setItem('vkusochka_cards', JSON.stringify(defaultCards));
-      setSavedCards(defaultCards);
+    const token = localStorage.getItem('vkusochka_token');
+    if (token) {
+      fetch('http://localhost:5147/api/profile/cards', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      .then(res => res.json())
+      .then(data => {
+        setSavedCards(data);
+        if (data.length > 0 && !formData.selectedCardId) {
+          setFormData(prev => ({ ...prev, paymentMethod: 'card', selectedCardId: data[0].id }));
+        }
+      })
+      .catch(() => {});
     }
-  }, []);
-
-  const getCardBrand = (number) => {
-    const cleanNumber = number.replace(/\s/g, '');
-    if (/^4/.test(cleanNumber)) return 'Visa';
-    if (/^5[1-5]|^2[2-7]/.test(cleanNumber)) return 'Mastercard';
-    if (/^220[0-4]/.test(cleanNumber)) return 'МИР';
-    return 'Card';
-  };
-
-  const validateLuhn = (number) => {
-    const cleanNumber = number.replace(/\s/g, '');
-    if (!/^\d+$/.test(cleanNumber)) return false;
-    let sum = 0;
-    let shouldDouble = false;
-    for (let i = cleanNumber.length - 1; i >= 0; i--) {
-      let digit = parseInt(cleanNumber.charAt(i));
-      if (shouldDouble) {
-        if ((digit *= 2) > 9) digit -= 9;
-      }
-      sum += digit;
-      shouldDouble = !shouldDouble;
-    }
-    return sum % 10 === 0;
-  };
+  }, [setFormData]);
 
   const validateCardForm = () => {
     const newErrors = {};
@@ -51,8 +30,6 @@ export default function PaymentMethod({ formData, setFormData }) {
 
     if (cleanNumber.length !== 16) {
       newErrors.number = 'Номер карты должен состоять из 16 цифр';
-    } else if (!validateLuhn(cleanNumber)) {
-      newErrors.number = 'Неверный номер карты (проверка Луна отклонена)';
     }
 
     if (!/^\d{2}\/\d{2}$/.test(newCard.expiry)) {
@@ -103,17 +80,26 @@ export default function PaymentMethod({ formData, setFormData }) {
   const handleAddCard = () => {
     if (!validateCardForm()) return;
 
-    const brand = getCardBrand(newCard.number);
-    const last4 = newCard.number.replace(/\s/g, '').slice(-4);
-    const newId = Date.now().toString();
-    
-    const updatedCards = [...savedCards, { id: newId, last4, brand }];
-    setSavedCards(updatedCards);
-    localStorage.setItem('vkusochka_cards', JSON.stringify(updatedCards));
-    setFormData(prev => ({ ...prev, paymentMethod: 'card', selectedCardId: newId }));
-    setIsAddCardOpen(false);
-    setNewCard({ number: '', expiry: '', cvv: '' });
-    setErrors({});
+    const token = localStorage.getItem('vkusochka_token');
+    if (token) {
+      fetch('http://localhost:5147/api/profile/cards', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ number: newCard.number })
+      })
+      .then(res => res.json())
+      .then(data => {
+        setSavedCards(prev => [...prev, data]);
+        setFormData(prev => ({ ...prev, paymentMethod: 'card', selectedCardId: data.id }));
+        setIsAddCardOpen(false);
+        setNewCard({ number: '', expiry: '', cvv: '' });
+        setErrors({});
+      })
+      .catch(() => {});
+    }
   };
 
   return (
@@ -151,7 +137,7 @@ export default function PaymentMethod({ formData, setFormData }) {
                       >
                         <div className="flex items-center gap-3">
                           <span className="material-symbols-outlined text-tertiary">credit_card</span>
-                          <span className="font-body-md text-on-surface">{card.brand} • • • • {card.last4}</span>
+                          <span className="font-body-md text-on-surface">{card.maskedNumber}</span>
                         </div>
                         {formData.selectedCardId === card.id && (
                           <span className="material-symbols-outlined text-primary-container text-[20px]">check_circle</span>
@@ -179,7 +165,7 @@ export default function PaymentMethod({ formData, setFormData }) {
             </div>
             <input 
               type="radio" 
-                name="paymentMethod" 
+              name="paymentMethod" 
               value="cash" 
               checked={formData.paymentMethod === 'cash'}
               onChange={(e) => setFormData(prev => ({ ...prev, paymentMethod: e.target.value }))}
@@ -206,14 +192,7 @@ export default function PaymentMethod({ formData, setFormData }) {
 
             <div className="flex flex-col gap-4">
               <div>
-                <div className="flex justify-between items-center mb-1">
-                  <label className="font-label-sm text-tertiary block">Номер карты</label>
-                  {newCard.number && (
-                    <span className="text-xs font-bold px-2 py-0.5 bg-primary-container/20 text-primary-container rounded">
-                      {getCardBrand(newCard.number)}
-                    </span>
-                  )}
-                </div>
+                <label className="font-label-sm text-tertiary block mb-1">Номер карты</label>
                 <input 
                   type="text" 
                   maxLength="19"

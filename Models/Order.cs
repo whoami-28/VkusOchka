@@ -1,15 +1,17 @@
+using System.Text.Json.Serialization;
+
 namespace FoodDelivery.Models
 {
     public class Order
     {
         public int Id { get; set; }
         public int UserId { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public string Status { get; set; } = string.Empty;
-        public string DeliveryAddress { get; set; } = string.Empty;
+        public string Address { get; set; } = string.Empty;
         public decimal TotalPrice { get; set; }
-        
-        public User? User { get; set; }
-        public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+        public string Status { get; set; } = "Готовится";
+        public DateTime OrderDate { get; set; } = DateTime.Now;
+
+        [JsonIgnore] public User? User { get; set; }
+        public List<OrderItem> OrderItems { get; set; } = new();
     }
 }

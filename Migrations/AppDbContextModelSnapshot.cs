@@ -150,6 +150,21 @@ namespace Vkusochka.Migrations
                     b.ToTable("Dishes");
                 });
 
+            modelBuilder.Entity("FoodDelivery.Models.FavoriteRestaurant", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RestaurantId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "RestaurantId");
+
+                    b.HasIndex("RestaurantId");
+
+                    b.ToTable("FavoriteRestaurants");
+                });
+
             modelBuilder.Entity("FoodDelivery.Models.Kitchen", b =>
                 {
                     b.Property<int>("Id")
@@ -178,12 +193,12 @@ namespace Vkusochka.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeliveryAddress")
+                    b.Property<string>("Address")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -210,15 +225,15 @@ namespace Vkusochka.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("DishName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("PriceAtPurchase")
                         .HasColumnType("decimal(10,2)");
-
-                    b.Property<string>("ProductName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -379,6 +394,25 @@ namespace Vkusochka.Migrations
                     b.Navigation("Restaurant");
                 });
 
+            modelBuilder.Entity("FoodDelivery.Models.FavoriteRestaurant", b =>
+                {
+                    b.HasOne("FoodDelivery.Models.Restaurant", "Restaurant")
+                        .WithMany()
+                        .HasForeignKey("RestaurantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FoodDelivery.Models.User", "User")
+                        .WithMany("FavoriteRestaurants")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Restaurant");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("FoodDelivery.Models.Order", b =>
                 {
                     b.HasOne("FoodDelivery.Models.User", "User")
@@ -458,6 +492,8 @@ namespace Vkusochka.Migrations
                     b.Navigation("Addresses");
 
                     b.Navigation("Carts");
+
+                    b.Navigation("FavoriteRestaurants");
 
                     b.Navigation("SavedCards");
                 });

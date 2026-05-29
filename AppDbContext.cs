@@ -17,6 +17,7 @@ namespace FoodDelivery.Models
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
+        public DbSet<FavoriteRestaurant> FavoriteRestaurants { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -34,6 +35,9 @@ namespace FoodDelivery.Models
                 .HasOne(rk => rk.Kitchen)
                 .WithMany(k => k.RestaurantKitchens)
                 .HasForeignKey(rk => rk.KitchenId);
+
+            modelBuilder.Entity<FavoriteRestaurant>()
+                .HasKey(fr => new { fr.UserId, fr.RestaurantId });
 
             modelBuilder.Entity<User>().Property(u => u.BonusBalance).HasColumnType("decimal(10,2)");
             modelBuilder.Entity<Dish>().Property(d => d.Price).HasColumnType("decimal(10,2)");

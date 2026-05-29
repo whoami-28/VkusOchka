@@ -21,7 +21,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="flex-grow max-w-7xl mx-auto w-full px-margin-mobile md:px-lg py-lg md:py-xl pt-28">
+    <div className="flex-grow max-w-7xl mx-auto w-full px-margin-mobile md:px-lg py-lg md:py-xl pt-36">
       <HeroBanner />
       <CategoryCarousel />
       

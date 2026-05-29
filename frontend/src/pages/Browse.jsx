@@ -47,7 +47,7 @@ export default function Browse() {
   }, [searchQuery, selectedKitchen]);
 
   return (
-    <div className="flex-grow max-w-7xl mx-auto w-full px-margin-mobile md:px-lg py-lg md:py-xl pt-28">
+    <div className="flex-grow max-w-7xl mx-auto w-full px-margin-mobile md:px-lg py-lg md:py-xl pt-36">
       <div className="flex flex-col gap-6 mb-8">
         <h1 className="font-h1 text-[32px] md:text-[40px] text-on-surface leading-none">Все рестораны</h1>
         

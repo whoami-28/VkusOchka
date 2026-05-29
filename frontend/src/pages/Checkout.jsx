@@ -18,7 +18,7 @@ export default function Checkout() {
     intercom: '',
     comment: '',
     paymentMethod: 'card',
-    selectedCardId: '1'
+    selectedCardId: ''
   });
 
   const subtotal = getCartTotal();
@@ -29,7 +29,7 @@ export default function Checkout() {
 
   if (cartItems.length === 0 && paymentState === 'idle') {
     return (
-      <div className="flex-grow max-w-7xl mx-auto w-full px-margin-mobile md:px-lg py-xl pt-32 text-center">
+      <div className="flex-grow max-w-7xl mx-auto w-full px-margin-mobile md:px-lg py-xl pt-36 text-center">
         <h1 className="font-h1 text-[32px] text-on-surface mb-4">Оформление невозможно</h1>
         <p className="font-body-md text-on-surface-variant mb-8">Сначала добавьте блюда в корзину.</p>
         <Link to="/browse" className="text-primary-container hover:underline font-label-md">Вернуться в каталог</Link>
@@ -39,8 +39,18 @@ export default function Checkout() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.street) {
-      alert('Пожалуйста, укажите улицу и дом');
+    
+    const cleanAddress = formData.street.trim();
+    if (cleanAddress.length < 10 || cleanAddress.length > 150) {
+      alert('Пожалуйста, введите корректный адрес (от 10 до 150 символов).');
+      return;
+    }
+    if (!/[a-zA-Zа-яА-ЯёЁ]/.test(cleanAddress)) {
+      alert('Адрес должен содержать буквы.');
+      return;
+    }
+    if (cleanAddress.includes('--') || cleanAddress.includes('  ') || /(.)\1{4,}/.test(cleanAddress)) {
+      alert('Введенный адрес содержит недопустимые повторения символов.');
       return;
     }
 
@@ -54,7 +64,7 @@ export default function Checkout() {
     setPaymentState('processing');
     
     const orderPayload = {
-      address: formData.street,
+      address: cleanAddress,
       total: total,
       items: cartItems.map(item => ({
         name: item.name + (item.note ? ` (${item.note})` : ''),
@@ -108,7 +118,7 @@ export default function Checkout() {
         </div>
       )}
 
-      <div className="flex-grow max-w-7xl mx-auto w-full px-margin-mobile md:px-lg py-lg md:py-xl pt-28">
+      <div className="flex-grow max-w-7xl mx-auto w-full px-margin-mobile md:px-lg py-lg md:py-xl pt-36">
         <div className="flex items-center gap-xs text-tertiary font-label-md mb-md">
           <Link to="/cart" className="hover:text-primary flex items-center gap-1">
             <span className="material-symbols-outlined text-[18px]">arrow_back</span>

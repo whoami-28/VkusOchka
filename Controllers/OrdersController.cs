@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 using FoodDelivery.Models;
+using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace FoodDelivery.Controllers
 {
@@ -18,77 +19,76 @@ namespace FoodDelivery.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetUserOrders()
-        {
-            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdStr)) return Unauthorized();
-            
-            var userId = int.Parse(userIdStr);
+        private int GetUserId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
+        [HttpGet]
+        public async Task<ActionResult> GetOrders()
+        {
             var orders = await _context.Orders
                 .Include(o => o.OrderItems)
-                .Where(o => o.UserId == userId)
-                .OrderByDescending(o => o.CreatedAt)
-                .Select(o => new
-                {
-                    id = o.Id,
-                    date = o.CreatedAt.ToString("dd.MM.yyyy"),
-                    status = o.Status,
-                    total = o.TotalPrice,
-                    address = o.DeliveryAddress,
-                    items = o.OrderItems.Select(oi => new {
-                        name = oi.ProductName,
-                        quantity = oi.Quantity,
-                        price = oi.PriceAtPurchase
-                    })
-                })
+                .Where(o => o.UserId == GetUserId())
+                .OrderByDescending(o => o.OrderDate)
                 .ToListAsync();
 
-            return Ok(orders);
+            var result = orders.Select(o => new
+            {
+                o.Id,
+                Date = o.OrderDate.ToString("dd.MM.yyyy HH:mm"),
+                o.Status,
+                o.Address,
+                Total = o.TotalPrice,
+                Items = o.OrderItems.Select(oi => new { oi.DishName, oi.Quantity, Price = oi.PriceAtPurchase })
+            });
+
+            return Ok(result);
+        }
+
+        public class CreateOrderRequest
+        {
+            public string Address { get; set; } = string.Empty;
+            public decimal Total { get; set; }
+            public List<OrderItemRequest> Items { get; set; } = new();
+        }
+
+        public class OrderItemRequest
+        {
+            public string Name { get; set; } = string.Empty;
+            public int Quantity { get; set; }
+            public decimal Price { get; set; }
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateOrder([FromBody] CreateOrderDto request)
+        public async Task<ActionResult> CreateOrder([FromBody] CreateOrderRequest request)
         {
-            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdStr)) return Unauthorized();
+            if (string.IsNullOrWhiteSpace(request.Address) || request.Address.Length < 10 || request.Address.Length > 150 || request.Address.Contains("--") || request.Address.Contains("  ") || !Regex.IsMatch(request.Address, @"[a-zA-Zа-яА-ЯёЁ]") || Regex.IsMatch(request.Address, @"(.)\1{4,}"))
+                return BadRequest(new { message = "Отказано. Некорректный адрес доставки (запрещены частые повторения символов и бессмысленные наборы)." });
 
-            var userId = int.Parse(userIdStr);
+            if (request.Items == null || !request.Items.Any())
+                return BadRequest(new { message = "Пустой заказ" });
 
             var order = new Order
             {
-                UserId = userId,
-                CreatedAt = DateTime.UtcNow,
-                Status = "Готовится",
-                DeliveryAddress = request.Address,
+                UserId = GetUserId(),
+                Address = request.Address.Trim(),
                 TotalPrice = request.Total,
-                OrderItems = request.Items.Select(i => new OrderItem
-                {
-                    ProductName = i.Name,
-                    Quantity = i.Quantity,
-                    PriceAtPurchase = i.Price
-                }).ToList()
+                Status = "Готовится",
+                OrderDate = DateTime.Now
             };
+
+            foreach (var item in request.Items)
+            {
+                order.OrderItems.Add(new OrderItem
+                {
+                    DishName = item.Name,
+                    Quantity = item.Quantity,
+                    PriceAtPurchase = item.Price
+                });
+            }
 
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Заказ успешно создан", orderId = order.Id });
+            return Ok(new { order.Id });
         }
-    }
-
-    public class CreateOrderDto
-    {
-        public string Address { get; set; } = string.Empty;
-        public decimal Total { get; set; }
-        public List<OrderItemDto> Items { get; set; } = new();
-    }
-
-    public class OrderItemDto
-    {
-        public string Name { get; set; } = string.Empty;
-        public int Quantity { get; set; }
-        public decimal Price { get; set; }
     }
 }

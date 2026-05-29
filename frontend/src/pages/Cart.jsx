@@ -15,27 +15,40 @@ export default function Cart() {
       return;
     }
 
-    const currentFavorites = JSON.parse(localStorage.getItem('vkusochka_favorites') || '[]');
-    const newTemplate = {
-      id: Date.now(),
-      name: templateName.trim(),
-      items: cartItems.map(item => ({
-        id: item.id,
-        name: item.name,
-        price: item.price,
-        quantity: item.quantity,
-        note: item.note || ''
-      }))
-    };
+    const token = localStorage.getItem('vkusochka_token');
+    if (!token) {
+      alert('Пожалуйста, войдите в аккаунт для сохранения корзины');
+      return;
+    }
 
-    localStorage.setItem('vkusochka_favorites', JSON.stringify([newTemplate, ...currentFavorites]));
-    alert('Корзина успешно сохранена как шаблон в профиле!');
-    setTemplateName('');
+    fetch('http://localhost:5147/api/cart/favorite', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        name: templateName.trim(),
+        items: cartItems.map(item => ({
+          dishId: item.id,
+          quantity: item.quantity
+        }))
+      })
+    })
+    .then(res => {
+      if (res.ok) {
+        alert('Корзина успешно сохранена в профиле!');
+        setTemplateName('');
+      } else {
+        alert('Ошибка при сохранении корзины');
+      }
+    })
+    .catch(() => alert('Ошибка соединения с сервером'));
   };
 
   if (cartItems.length === 0) {
     return (
-      <div className="flex-grow max-w-7xl mx-auto w-full px-margin-mobile md:px-lg py-xl flex flex-col items-center justify-center pt-32 text-center min-h-[70vh]">
+      <div className="flex-grow max-w-7xl mx-auto w-full px-margin-mobile md:px-lg py-xl flex flex-col items-center justify-center pt-36 text-center min-h-[70vh]">
         <div className="w-40 h-40 mb-6 bg-surface-container rounded-full flex items-center justify-center border border-outline-variant/30 shadow-sm">
           <span className="material-symbols-outlined text-[64px] text-tertiary">shopping_basket</span>
         </div>
@@ -51,7 +64,7 @@ export default function Cart() {
   }
 
   return (
-    <div className="flex-grow max-w-7xl mx-auto w-full px-margin-mobile md:px-lg py-lg md:py-xl pt-28">
+    <div className="flex-grow max-w-7xl mx-auto w-full px-margin-mobile md:px-lg py-lg md:py-xl pt-36">
       <div className="flex items-center gap-xs text-tertiary font-label-md mb-md">
         <Link to="/" className="hover:text-primary">Главная</Link>
         <span className="material-symbols-outlined text-[16px]">chevron_right</span>

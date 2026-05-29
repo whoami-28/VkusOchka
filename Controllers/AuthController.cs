@@ -5,6 +5,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using FoodDelivery.Models;
+using System.Text.RegularExpressions;
 
 namespace FoodDelivery.Controllers
 {
@@ -22,38 +23,42 @@ namespace FoodDelivery.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterRequest request)
+        public async Task<ActionResult> Register([FromBody] AuthRequest request)
         {
+            if (string.IsNullOrWhiteSpace(request.Name) || request.Name.Length < 2 || request.Name.Length > 50 || request.Name.Contains("--") || request.Name.Contains("  ") || Regex.IsMatch(request.Name, @"(.)\1{3,}") || !Regex.IsMatch(request.Name, @"^[a-zA-Zа-яА-ЯёЁ\s\-]+$"))
+                return BadRequest(new { message = "Некорректное имя пользователя. Используйте только буквы, пробел или дефис (от 2 до 50 символов)." });
+
             if (await _context.Users.AnyAsync(u => u.Email == request.Email))
-            {
-                return BadRequest("Пользователь с таким email уже существует.");
-            }
+                return BadRequest(new { message = "Email уже используется" });
 
             var user = new User
             {
-                Name = request.Name,
                 Email = request.Email,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                Name = request.Name.Trim()
             };
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Регистрация успешна!" });
+            return Ok(new { token = GenerateJwtToken(user), user = new { user.Name, user.Email } });
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginRequest request)
+        public async Task<ActionResult> Login([FromBody] AuthRequest request)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
             if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
-            {
-                return Unauthorized("Неверный email или пароль.");
-            }
+                return Unauthorized(new { message = "Неверный email или пароль" });
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!);
-            
+            return Ok(new { token = GenerateJwtToken(user), user = new { user.Name, user.Email } });
+        }
+
+        private string GenerateJwtToken(User user)
+        {
+            var jwtSettings = _configuration.GetSection("Jwt");
+            var key = Encoding.ASCII.GetBytes(jwtSettings["Key"]!);
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[]
@@ -63,19 +68,12 @@ namespace FoodDelivery.Controllers
                     new Claim(ClaimTypes.Name, user.Name)
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
-                Issuer = _configuration["Jwt:Issuer"],
-                Audience = _configuration["Jwt:Audience"],
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
+            var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.CreateToken(tokenDescriptor);
-            var jwt = tokenHandler.WriteToken(token);
-
-            return Ok(new
-            {
-                token = jwt,
-                user = new { user.Id, user.Name, user.Email, user.BonusBalance }
-            });
+            return tokenHandler.WriteToken(token);
         }
     }
 }

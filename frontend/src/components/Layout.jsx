@@ -18,7 +18,7 @@ export default function Layout() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -15 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
-          className="flex-grow flex flex-col w-full"
+          className="flex-grow flex flex-col w-full mt-20"
         >
           <Outlet />
         </motion.main>

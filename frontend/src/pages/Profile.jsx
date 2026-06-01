@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import ProfileSidebar from '../components/profile/ProfileSidebar';
 import Button from '../ui/Button';
+import { useCart } from '../context/CartContext';
 
 function useFetchWithAuth() {
   const navigate = useNavigate();
@@ -28,6 +29,9 @@ function useFetchWithAuth() {
         navigate('/auth');
         throw new Error('Unauthorized');
       }
+      if (!res.ok) {
+        throw new Error('API Error');
+      }
       return res;
     });
   };
@@ -41,8 +45,11 @@ function OrderHistoryView() {
   useEffect(() => {
     fetchAuth('http://localhost:5147/api/orders')
       .then(res => res.json())
-      .then(data => setOrders(data))
-      .catch(() => {})
+      .then(data => {
+        if (Array.isArray(data)) setOrders(data);
+        else setOrders([]);
+      })
+      .catch(() => setOrders([]))
       .finally(() => setIsLoading(false));
   }, []);
 
@@ -98,8 +105,11 @@ function FavoriteRestaurantsView() {
   useEffect(() => {
     fetchAuth('http://localhost:5147/api/profile/favorite-restaurants')
       .then(res => res.json())
-      .then(data => setFavs(data))
-      .catch(() => {});
+      .then(data => {
+        if (Array.isArray(data)) setFavs(data);
+        else setFavs([]);
+      })
+      .catch(() => setFavs([]));
   }, []);
 
   const removeFav = (id) => {
@@ -139,18 +149,38 @@ function FavoriteRestaurantsView() {
 function FavoriteCartsView() {
   const [favorites, setFavorites] = useState([]);
   const fetchAuth = useFetchWithAuth();
+  const { addToCart, clearCart } = useCart();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchAuth('http://localhost:5147/api/profile/favorite-carts')
       .then(res => res.json())
-      .then(data => setFavorites(data))
-      .catch(() => {});
+      .then(data => {
+        if (Array.isArray(data)) setFavorites(data);
+        else setFavorites([]);
+      })
+      .catch(() => setFavorites([]));
   }, []);
 
   const handleDelete = (id) => {
     fetchAuth(`http://localhost:5147/api/profile/favorite-carts/${id}`, { method: 'DELETE' })
       .then(() => setFavorites(favorites.filter(f => f.id !== id)))
       .catch(() => {});
+  };
+
+  const handleRepeatCart = (fav) => {
+    clearCart();
+    fav.items.forEach(item => {
+      addToCart({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        image: item.image,
+        restaurantId: item.restaurantId,
+        quantity: item.quantity
+      }, item.quantity);
+    });
+    navigate('/cart');
   };
 
   if (favorites.length === 0) {
@@ -173,9 +203,12 @@ function FavoriteCartsView() {
             </p>
           </div>
           <div className="flex items-center gap-2 self-end sm:self-center">
+            <Button onClick={() => handleRepeatCart(fav)} className="px-4 py-2 text-sm flex items-center gap-1">
+              <span className="material-symbols-outlined text-[18px]">shopping_cart_checkout</span>
+              Повторить
+            </Button>
             <button onClick={() => handleDelete(fav.id)} className="text-error hover:bg-error/10 transition-colors p-2 rounded-lg flex items-center gap-1">
               <span className="material-symbols-outlined text-[20px]">delete</span>
-              <span className="font-label-sm">Удалить</span>
             </button>
           </div>
         </div>
@@ -194,8 +227,11 @@ function SavedCardsView() {
   useEffect(() => {
     fetchAuth('http://localhost:5147/api/profile/cards')
       .then(res => res.json())
-      .then(data => setCards(data))
-      .catch(() => {});
+      .then(data => {
+        if (Array.isArray(data)) setCards(data);
+        else setCards([]);
+      })
+      .catch(() => setCards([]));
   }, []);
 
   const validateCardForm = () => {
@@ -299,8 +335,11 @@ function SavedAddressesView() {
   useEffect(() => {
     fetchAuth('http://localhost:5147/api/profile/addresses')
       .then(res => res.json())
-      .then(data => setAddresses(data))
-      .catch(() => {});
+      .then(data => {
+        if (Array.isArray(data)) setAddresses(data);
+        else setAddresses([]);
+      })
+      .catch(() => setAddresses([]));
   }, []);
 
   const handleDelete = (id) => {
@@ -329,10 +368,7 @@ function SavedAddressesView() {
       method: 'POST',
       body: JSON.stringify({ fullAddress: cleanAddress })
     })
-    .then(res => {
-      if (!res.ok) throw new Error('Ошибка валидации');
-      return res.json();
-    })
+    .then(res => res.json())
     .then(data => {
       setAddresses([...addresses, data]);
       setNewText('');

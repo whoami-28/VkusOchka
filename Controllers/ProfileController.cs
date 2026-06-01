@@ -125,9 +125,12 @@ namespace FoodDelivery.Controllers
         public async Task<ActionResult> GetFavoriteRestaurants()
         {
             var favs = await _context.FavoriteRestaurants
-                .Include(fr => fr.Restaurant)
                 .Where(fr => fr.UserId == GetUserId())
-                .Select(fr => fr.Restaurant)
+                .Select(fr => new {
+                    Id = fr.RestaurantId,
+                    Name = fr.Restaurant != null ? fr.Restaurant.Name : "Неизвестно",
+                    Image = fr.Restaurant != null ? fr.Restaurant.Image : null
+                })
                 .ToListAsync();
             return Ok(favs);
         }
@@ -160,17 +163,22 @@ namespace FoodDelivery.Controllers
         public async Task<ActionResult> GetFavoriteCarts()
         {
             var carts = await _context.Carts
-                .Include(c => c.CartItems)
-                .ThenInclude(ci => ci.Dish)
                 .Where(c => c.UserId == GetUserId() && !string.IsNullOrEmpty(c.Name))
+                .Select(c => new {
+                    c.Id,
+                    c.Name,
+                    Items = c.CartItems.Select(ci => new { 
+                        Id = ci.DishId,
+                        Name = ci.Dish != null ? ci.Dish.Name : "Неизвестно", 
+                        Quantity = ci.Quantity, 
+                        Price = ci.Dish != null ? ci.Dish.Price : 0,
+                        Image = ci.Dish != null ? ci.Dish.Image : null,
+                        RestaurantId = ci.Dish != null ? ci.Dish.RestaurantId : 0
+                    }).ToList()
+                })
                 .ToListAsync();
             
-            var result = carts.Select(c => new {
-                c.Id,
-                c.Name,
-                Items = c.CartItems.Select(ci => new { ci.Dish!.Name, ci.Quantity, Price = ci.Dish!.Price })
-            });
-            return Ok(result);
+            return Ok(carts);
         }
 
         [HttpDelete("favorite-carts/{id}")]

@@ -127,9 +127,11 @@ namespace FoodDelivery.Controllers
             var favs = await _context.FavoriteRestaurants
                 .Where(fr => fr.UserId == GetUserId())
                 .Select(fr => new {
-                    Id = fr.RestaurantId,
-                    Name = fr.Restaurant != null ? fr.Restaurant.Name : "Неизвестно",
-                    Image = fr.Restaurant != null ? fr.Restaurant.Image : null
+                    id = fr.RestaurantId,
+                    name = fr.Restaurant!.Name,
+                    image = fr.Restaurant.Image,
+                    rating = fr.Restaurant.Rating,
+                    description = fr.Restaurant.Description
                 })
                 .ToListAsync();
             return Ok(favs);
@@ -163,6 +165,8 @@ namespace FoodDelivery.Controllers
         public async Task<ActionResult> GetFavoriteCarts()
         {
             var carts = await _context.Carts
+                .Include(c => c.CartItems)
+                .ThenInclude(ci => ci.Dish)
                 .Where(c => c.UserId == GetUserId() && !string.IsNullOrEmpty(c.Name))
                 .Select(c => new {
                     c.Id,

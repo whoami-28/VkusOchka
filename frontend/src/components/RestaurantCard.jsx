@@ -5,31 +5,46 @@ export default function RestaurantCard({ restaurant }) {
   const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
-    const favs = JSON.parse(localStorage.getItem('vkusochka_fav_restaurants') || '[]');
-    setIsFavorite(favs.some(fav => fav.id === restaurant.id));
+    const token = localStorage.getItem('vkusochka_token');
+    if (token) {
+      fetch('http://localhost:5147/api/profile/favorite-restaurants', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setIsFavorite(data.some(fav => fav.id === restaurant.id));
+        }
+      })
+      .catch(() => {});
+    }
   }, [restaurant.id]);
 
-  const toggleFavorite = (e) => {
+  const toggleFavorite = async (e) => {
     e.preventDefault(); 
     e.stopPropagation();
 
-    const favs = JSON.parse(localStorage.getItem('vkusochka_fav_restaurants') || '[]');
-    let updatedFavs;
-    
-    if (isFavorite) {
-      updatedFavs = favs.filter(fav => fav.id !== restaurant.id);
-    } else {
-      updatedFavs = [...favs, { 
-        id: restaurant.id, 
-        name: restaurant.name, 
-        image: restaurant.image,
-        description: restaurant.description,
-        rating: restaurant.rating
-      }];
+    const token = localStorage.getItem('vkusochka_token');
+    if (!token) {
+      alert('Для добавления в избранное необходимо войти в аккаунт');
+      return;
     }
-    
-    localStorage.setItem('vkusochka_fav_restaurants', JSON.stringify(updatedFavs));
-    setIsFavorite(!isFavorite);
+
+    try {
+      const method = isFavorite ? 'DELETE' : 'POST';
+      const res = await fetch(`http://localhost:5147/api/profile/favorite-restaurants/${restaurant.id}`, {
+        method: method,
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (res.ok) {
+        setIsFavorite(!isFavorite);
+      } else {
+        console.error('Не удалось обновить избранное');
+      }
+    } catch (err) {
+      console.error('Ошибка соединения с сервером', err);
+    }
   };
 
   return (
@@ -64,11 +79,11 @@ export default function RestaurantCard({ restaurant }) {
         <div className="flex justify-between items-start mb-2 gap-2">
           <h3 className="font-h2 text-[18px] text-on-surface leading-tight truncate flex-grow">
             {restaurant.name}
-            </h3>
-            <div className="flex items-center gap-1 bg-surface-container px-1.5 py-0.5 rounded text-on-surface font-label-sm flex-shrink-0">
+          </h3>
+          <div className="flex items-center gap-1 bg-surface-container px-1.5 py-0.5 rounded text-on-surface font-label-sm flex-shrink-0">
             {restaurant.rating || "4.8"}
             <span className="material-symbols-outlined text-[14px] text-primary-container" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-            </div>
+          </div>
         </div>
         <p className="font-body-md text-on-surface-variant text-sm line-clamp-2 mb-4 flex-grow">
             {restaurant.description}
@@ -77,9 +92,9 @@ export default function RestaurantCard({ restaurant }) {
             <span className="font-label-md text-on-surface-variant">От $25</span>
             <Button className="px-5 py-2 text-sm">Перейти</Button>
         </div>
-        </div>
+      </div>
     </Link>
-    );
+  );
 }
 
 function Button({ children, className }) {

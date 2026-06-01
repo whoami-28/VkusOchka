@@ -4,20 +4,41 @@ export default function RestaurantHero({ restaurant }) {
   const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
-    const favs = JSON.parse(localStorage.getItem('vkusochka_fav_restaurants') || '[]');
-    setIsFavorite(favs.some(fav => fav.id === restaurant.id));
+    const token = localStorage.getItem('vkusochka_token');
+    if (token) {
+      fetch('http://localhost:5147/api/profile/favorite-restaurants', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setIsFavorite(data.some(fav => fav.id === restaurant.id));
+        }
+      })
+      .catch(() => {});
+    }
   }, [restaurant.id]);
 
-  const toggleFavorite = () => {
-    const favs = JSON.parse(localStorage.getItem('vkusochka_fav_restaurants') || '[]');
-    let updatedFavs;
-    if (isFavorite) {
-      updatedFavs = favs.filter(fav => fav.id !== restaurant.id);
-    } else {
-      updatedFavs = [...favs, { id: restaurant.id, name: restaurant.name, image: restaurant.image }];
+  const toggleFavorite = async () => {
+    const token = localStorage.getItem('vkusochka_token');
+    if (!token) {
+      alert('Для добавления в избранное необходимо войти в аккаунт');
+      return;
     }
-    localStorage.setItem('vkusochka_fav_restaurants', JSON.stringify(updatedFavs));
-    setIsFavorite(!isFavorite);
+
+    try {
+      const method = isFavorite ? 'DELETE' : 'POST';
+      const res = await fetch(`http://localhost:5147/api/profile/favorite-restaurants/${restaurant.id}`, {
+        method: method,
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (res.ok) {
+        setIsFavorite(!isFavorite);
+      }
+    } catch (err) {
+      console.error('Ошибка соединения с сервером', err);
+    }
   };
 
   return (

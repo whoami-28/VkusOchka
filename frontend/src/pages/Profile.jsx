@@ -130,15 +130,36 @@ function FavoriteRestaurantsView() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {favs.map(fav => (
-        <div key={fav.id} className="bg-surface-container-low border border-outline-variant/30 rounded-2xl overflow-hidden shadow-sm flex flex-col group">
-          <div className="h-32 w-full overflow-hidden relative cursor-pointer" onClick={() => navigate(`/restaurant/${fav.id}`)}>
-            <img src={fav.image} alt={fav.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+        <div key={fav.id} className="bg-surface-container-low border border-outline-variant/30 rounded-2xl overflow-hidden shadow-sm flex flex-col h-full">
+          <div className="h-40 w-full overflow-hidden relative">
+            <img 
+              src={fav.image || 'https://via.placeholder.com/400x200?text=No+Image'} 
+              alt={fav.name} 
+              className="w-full h-full object-cover" 
+            />
+            <div className="absolute top-3 right-3 bg-surface/90 backdrop-blur-md px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-sm">
+              <span className="material-symbols-outlined text-[16px] text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+              <span className="font-label-sm text-on-surface text-sm">{fav.rating || 'Новый'}</span>
+            </div>
           </div>
-          <div className="p-4 flex justify-between items-center">
-            <h3 className="font-h2 text-[18px] text-on-surface cursor-pointer hover:text-primary-container transition-colors truncate" onClick={() => navigate(`/restaurant/${fav.id}`)}>{fav.name}</h3>
-            <button onClick={() => removeFav(fav.id)} className="text-on-surface-variant hover:text-error transition-colors p-2 flex-shrink-0 ml-2">
-              <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 1" }}>heart_broken</span>
-            </button>
+          <div className="p-4 flex flex-col flex-grow">
+            <h3 className="font-h2 text-[20px] text-on-surface mb-1">{fav.name}</h3>
+            <p className="font-body-md text-on-surface-variant text-sm line-clamp-2 mb-4 flex-grow">
+              {fav.description || 'Одно из ваших любимых заведений. Закажите что-нибудь вкусное прямо сейчас!'}
+            </p>
+            <div className="flex gap-2 mt-auto">
+              <Button onClick={() => navigate(`/restaurant/${fav.id}`)} className="flex-grow py-2.5 text-sm flex items-center justify-center gap-2">
+                <span className="material-symbols-outlined text-[18px]">restaurant_menu</span>
+                В меню
+              </Button>
+              <button 
+                onClick={() => removeFav(fav.id)} 
+                className="px-3 py-2.5 bg-error/10 text-error rounded-xl hover:bg-error/20 transition-colors flex items-center justify-center"
+                title="Удалить из избранного"
+              >
+                <span className="material-symbols-outlined text-[20px]">heart_broken</span>
+              </button>
+            </div>
           </div>
         </div>
       ))}
@@ -176,8 +197,7 @@ function FavoriteCartsView() {
         name: item.name,
         price: item.price,
         image: item.image,
-        restaurantId: item.restaurantId,
-        quantity: item.quantity
+        restaurantId: item.restaurantId
       }, item.quantity);
     });
     navigate('/cart');
@@ -203,7 +223,7 @@ function FavoriteCartsView() {
             </p>
           </div>
           <div className="flex items-center gap-2 self-end sm:self-center">
-            <Button onClick={() => handleRepeatCart(fav)} className="px-4 py-2 text-sm flex items-center gap-1">
+            <Button onClick={() => handleRepeatCart(fav)} className="px-4 py-2 text-sm flex items-center gap-2">
               <span className="material-symbols-outlined text-[18px]">shopping_cart_checkout</span>
               Повторить
             </Button>

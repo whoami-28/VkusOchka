@@ -17,7 +17,6 @@ D:\01_Temp\Projects\Vkusochka\bin\Debug\net10.0\Vkusochka.pdb
 D:\01_Temp\Projects\Vkusochka\bin\Debug\net10.0\Azure.Core.dll
 D:\01_Temp\Projects\Vkusochka\bin\Debug\net10.0\Azure.Identity.dll
 D:\01_Temp\Projects\Vkusochka\bin\Debug\net10.0\Humanizer.dll
-D:\01_Temp\Projects\Vkusochka\bin\Debug\net10.0\Microsoft.AspNetCore.OpenApi.dll
 D:\01_Temp\Projects\Vkusochka\bin\Debug\net10.0\Microsoft.Bcl.AsyncInterfaces.dll
 D:\01_Temp\Projects\Vkusochka\bin\Debug\net10.0\Microsoft.Bcl.Cryptography.dll
 D:\01_Temp\Projects\Vkusochka\bin\Debug\net10.0\Microsoft.Build.Framework.dll
